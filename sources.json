@@ -1,0 +1,21 @@
+{
+  "discvault": {
+    "app_repo": "helmerzNL/DiscVault",
+    "image": "ghcr.io/helmerznl/discvault-launcher",
+    "beta_overrides": {
+      "DISCVAULT_CHANNEL": "beta",
+      "DISCVAULT_PROJECT_NAME": "discvault_beta_stack",
+      "DISCVAULT_NETWORK": "discvault-beta-stack"
+    }
+  },
+  "doorbell-map": {
+    "app_repo": "helmerzNL/Doorbell-Map",
+    "image": "ghcr.io/helmerznl/doorbell-map",
+    "beta_env": "DOORBELL_MAP_TAG"
+  },
+  "mealieshopper": {
+    "app_repo": "helmerzNL/MealieShopper",
+    "image": "ghcr.io/helmerznl/mealieshopper",
+    "beta_env": "MEALIESHOPPER_TAG"
+  }
+}

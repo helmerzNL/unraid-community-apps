@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>MealieShopper</Name>
+  <Repository>ghcr.io/helmerznl/mealieshopper:latest</Repository>
+  <Registry>https://github.com/helmerzNL/MealieShopper/pkgs/container/mealieshopper</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/helmerzNL/MealieShopper/issues</Support>
+  <Project>https://github.com/helmerzNL/MealieShopper</Project>
+  <Overview>English: MealieShopper turns your week menu from Mealie into a basket at Albert Heijn, Picnic or Jumbo. Everything below is optional: on the first start the app guides you through security and the links with Mealie and your supermarkets. Use a reverse proxy with https for access from outside; do not expose the port directly to the internet.[br][br]Nederlands: MealieShopper zet je weekmenu uit Mealie om in een boodschappenmandje bij Albert Heijn, Picnic of Jumbo. Alles hieronder is optioneel: bij de eerste start loopt de app je door de beveiliging en de koppelingen met Mealie en je supermarkten. Gebruik een reverse proxy met https om van buitenaf erbij te kunnen; zet de poort niet rechtstreeks op internet.</Overview>
+  <Category>Productivity:</Category>
+  <WebUI>http://[IP]:[PORT:8000]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/templates/mealieshopper.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/icons/mealieshopper.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <Date>2026-10-28</Date>
+  <MinVer>6.12.0</MinVer>
+  <Config Name="Web UI port" Target="8000" Default="5959" Mode="tcp" Description="Port of the web interface (container port 8000). / Poort van de webinterface (containerpoort 8000)." Type="Port" Display="always" Required="true" Mask="false">5959</Config>
+  <Config Name="App data" Target="/data" Default="/mnt/user/appdata/mealieshopper" Mode="rw" Description="Database and secret.key. Include the whole folder in your backups. / Database en secret.key. Neem de hele map mee in je back-ups." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/mealieshopper</Config>
+  <Config Name="Mealie address" Target="MEALIE_URL" Default="" Mode="" Description="Where MealieShopper reaches Mealie, for example http://192.168.1.20:9925. Optional: you can also link Mealie in the app, which takes precedence. / Waar MealieShopper Mealie bereikt. Optioneel; koppelen in de app gaat voor." Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="Mealie API token" Target="MEALIE_API_TOKEN" Default="" Mode="" Description="A token from Mealie (user profile, API tokens). Optional. / Een token uit Mealie. Optioneel." Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="Public address" Target="MEALIESHOPPER_PUBLIC_BASE_URL" Default="" Mode="" Description="The address you open MealieShopper on from outside, for invitation links and the AI connection. Optional: the app detects it. / Het publieke adres. Optioneel: de app herkent het zelf." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Secret" Target="MEALIESHOPPER_AUTH_SECRET" Default="" Mode="" Description="A long, fixed, random value. Optional: without it the app makes secret.key in the app data folder. Do not change it afterwards. / Een lange, vaste, willekeurige waarde. Optioneel; verander hem niet achteraf." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="Claude API key" Target="ANTHROPIC_API_KEY" Default="" Mode="" Description="Optional. Lets Claude review the matches between ingredients and offers. / Optioneel." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="ChatGPT API key" Target="OPENAI_API_KEY" Default="" Mode="" Description="Optional. Lets ChatGPT review the matches between ingredients and offers. / Optioneel." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="Picnic country" Target="PICNIC_COUNTRY_CODE" Default="NL|DE|FR" Mode="" Description="The country of your Picnic account. / Het land van je Picnic-account." Type="Variable" Display="advanced" Required="false" Mask="false">NL</Config>
+  <Config Name="Fetch offers daily" Target="MEALIESHOPPER_OFFERS_SCHEDULE" Default="true|false" Mode="" Description="Daily task that fetches the offers of all stores. / Dagelijkse taak die de aanbiedingen ophaalt." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Hour of the offers run" Target="MEALIESHOPPER_OFFERS_SYNC_HOUR" Default="5" Mode="" Description="Hour of the day (0 to 23, container time). / Uur van de dag (0 tot 23, tijd van de container)." Type="Variable" Display="advanced" Required="false" Mask="false">5</Config>
+  <Config Name="MCP server for AI assistants" Target="MEALIESHOPPER_MCP" Default="true|false" Mode="" Description="Start value of the MCP server at /mcp; the switch in the app takes precedence. / Beginwaarde van de MCP-server; de schakelaar in de app gaat voor." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Update check" Target="MEALIESHOPPER_UPDATE_CHECK" Default="true|false" Mode="" Description="Let the app check GitHub for a newer release and tell the administrator. Nothing about you is sent. / De app kijkt op GitHub of er een nieuwere release is." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Audit log" Target="MEALIESHOPPER_AUDIT_LOG" Default="true|false" Mode="" Description="Store the traffic with the supermarkets and the requests of AI assistants in the audit log. / Bewaar het verkeer met de winkels en de AI-verzoeken in het auditlogboek." Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Audit log retention (days)" Target="MEALIESHOPPER_AUDIT_RETENTION_DAYS" Default="30" Mode="" Description="After how many days entries are deleted; 0 never deletes. / Na hoeveel dagen regels worden gewist; 0 = nooit." Type="Variable" Display="advanced" Required="false" Mask="false">30</Config>
+  <Config Name="Passkey host name" Target="RP_ID" Default="" Mode="" Description="Only for passkeys, with your own domain name and https: the host name only, without scheme or port. / Alleen voor passkeys: de hostnaam zonder schema of poort." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Passkey addresses" Target="RP_ORIGINS" Default="" Mode="" Description="Only for passkeys: the full address in the browser, comma-separated for more than one. / Alleen voor passkeys: het volledige adres in de browser." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Passkey name" Target="RP_NAME" Default="MealieShopper" Mode="" Description="The name shown when creating a passkey. / De naam die bij het maken van een passkey getoond wordt." Type="Variable" Display="advanced" Required="false" Mask="false">MealieShopper</Config>
+</Container>

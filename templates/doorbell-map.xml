@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Doorbell Map</Name>
+  <Repository>ghcr.io/helmerznl/doorbell-map:latest</Repository>
+  <Registry>https://github.com/helmerzNL/Doorbell-Map/pkgs/container/doorbell-map</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/helmerzNL/Doorbell-Map/issues</Support>
+  <Project>https://github.com/helmerzNL/Doorbell-Map</Project>
+  <Overview>English: An interactive map of your neighbourhood on which every house is green, red or unmarked: who wants a visit at the door on St. Martin's Day, Halloween or another door-to-door event, and who does not. The admin draws the houses and manages everything at /beheer, protected by a passkey. Passkeys only work on an https address with a domain name, so put a reverse proxy with a certificate in front of it and enter that address as Origin.[br][br]Nederlands: Een interactieve kaart van je wijk waarop elk huis groen, rood of niet gemarkeerd is: wie wil er wel of niet dat er wordt aangebeld met Sint Maarten, Halloween of een andere deur-aan-deur-actie. De beheerder tekent de huizen en beheert alles op /beheer, beveiligd met een passkey. Passkeys werken alleen op een https-adres met een domeinnaam: zet er een reverse proxy met certificaat voor en vul dat adres in bij Origin.</Overview>
+  <Category>Tools:</Category>
+  <WebUI>http://[IP]:[PORT:9888]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/templates/doorbell-map.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/icons/doorbell-map.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <Date>2026-10-28</Date>
+  <MinVer>6.12.0</MinVer>
+  <Config Name="Web UI port" Target="9888" Default="9888" Mode="tcp" Description="Port of the web interface (container port 9888). / Poort van de webinterface (containerpoort 9888)." Type="Port" Display="always" Required="true" Mask="false">9888</Config>
+  <Config Name="App data" Target="/data" Default="/mnt/user/appdata/doorbell-map" Mode="rw" Description="Houses, passkeys, settings and the automatic backups. / Huizen, passkeys, instellingen en de automatische back-ups." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/doorbell-map</Config>
+  <Config Name="Origin" Target="ORIGIN" Default="" Mode="" Description="The full address the map is opened on, exactly as in the browser bar, for example https://map.example.com. / Het volledige adres waarop de kaart wordt geopend, precies zoals in de adresbalk." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Setup code" Target="SETUP_TOKEN" Default="" Mode="" Description="Secret code needed to create the very first passkey of the admin, at least 16 characters, for example from openssl rand -hex 12. / Geheime code voor de allereerste passkey van de beheerder, minstens 16 tekens." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Session secret" Target="SESSION_SECRET" Default="" Mode="" Description="Key that signs sessions, at least 16 characters, for example from openssl rand -hex 32. Keep it fixed: a new value signs everyone out. / Sleutel voor sessies, minstens 16 tekens. Houd hem vast: een nieuwe waarde logt iedereen uit." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Site title" Target="SITE_TITLE" Default="Onze wijk" Mode="" Description="The name of the site until you change it in the admin. / De naam van de site totdat je die in het beheer aanpast." Type="Variable" Display="advanced" Required="false" Mask="false">Onze wijk</Config>
+  <Config Name="Admin session (hours)" Target="SESSION_HOURS" Default="12" Mode="" Description="How long the admin stays signed in. / Hoe lang de beheerder ingelogd blijft." Type="Variable" Display="advanced" Required="false" Mask="false">12</Config>
+  <Config Name="Passkey domain" Target="RP_ID" Default="" Mode="" Description="Optional: the domain for passkeys. Empty means the host name of Origin, which is almost always right. / Optioneel; leeg betekent de hostnaam van Origin." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+</Container>

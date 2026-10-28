@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Maintainer>
+  <Icon>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/icons/helmerznl.png</Icon>
+  <Profile>
+    Templates for the self-hosted apps of helmerzNL: DiscVault (4K UHD, Blu-ray and DVD collection manager, installed through the DiscVault launcher), MealieShopper (week menu from Mealie to your supermarket basket) and Doorbell Map (neighbourhood map for door-to-door events), each with a beta template. Templates voor de zelf te hosten apps van helmerzNL.
+  </Profile>
+  <WebPage>https://github.com/helmerzNL/unraid-community-apps</WebPage>
+</Maintainer>
