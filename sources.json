@@ -1,0 +1,12 @@
+{
+  "doorbell-map": {
+    "app_repo": "helmerzNL/Doorbell-Map",
+    "image": "ghcr.io/helmerznl/doorbell-map",
+    "beta_env": "DOORBELL_MAP_TAG"
+  },
+  "mealieshopper": {
+    "app_repo": "helmerzNL/MealieShopper",
+    "image": "ghcr.io/helmerznl/mealieshopper",
+    "beta_env": "MEALIESHOPPER_TAG"
+  }
+}

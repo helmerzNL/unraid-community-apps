@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Checks and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The XML is well-formed
+        run: |
+          sudo apt-get install -y --no-install-recommends libxml2-utils
+          xmllint --noout templates/*.xml ca_profile.xml
+      - name: The beta templates match their stable templates
+        run: python scripts/derive_beta.py --check
+      - name: Every template is complete and consistent
+        run: python scripts/check_templates.py
+      - name: The images exist on ghcr.io
+        run: python scripts/check_templates.py --registry
+      - name: Tests
+        run: python -m unittest discover -s tests
