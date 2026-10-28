@@ -9,6 +9,8 @@ and a beta template with its own app data folder and port, so both can run next 
 
 | App | What it does | Image | Port | App data |
 |---|---|---|---|---|
+| [**DiscVault**](templates/discvault.xml) | Manager for your 4K UHD, Blu-ray and DVD collection (installs the DiscVault launcher, see below) | `ghcr.io/helmerznl/discvault-launcher:latest` | 6080 | `/mnt/user/appdata/discvault`, `discvault-postgres`, `discvault-launcher` |
+| [**DiscVault (beta)**](templates/discvault-beta.xml) | The development version | `ghcr.io/helmerznl/discvault-launcher:beta` | 6081 | `/mnt/user/appdata/discvault-beta`, `discvault-beta-postgres`, `discvault-beta-launcher` |
 | [**MealieShopper**](templates/mealieshopper.xml) | Week menu from Mealie to your supermarket basket | `ghcr.io/helmerznl/mealieshopper:latest` | 5959 | `/mnt/user/appdata/mealieshopper` |
 | [**MealieShopper (beta)**](templates/mealieshopper-beta.xml) | The development version | `ghcr.io/helmerznl/mealieshopper:beta` | 5960 | `/mnt/user/appdata/mealieshopper-beta` |
 | [**Doorbell Map**](templates/doorbell-map.xml) | Neighbourhood map of houses that do or do not want a visit | `ghcr.io/helmerznl/doorbell-map:latest` | 9888 | `/mnt/user/appdata/doorbell-map` |
@@ -17,8 +19,13 @@ and a beta template with its own app data folder and port, so both can run next 
 All images are public and built for amd64 and arm64. A beta can change the database in ways the stable version cannot read: never point it at the
 data folder of the stable app.
 
-Not included yet: **DiscVault** and **3D Print Pricing**. Both need a PostgreSQL 17 database next to the app, and the store has no way to declare
-that dependency; they follow once it is decided how to offer them (a separate database template, a Compose stack or an all-in-one image).
+**DiscVault** needs a PostgreSQL database next to the app, and the store cannot declare such a dependency. So its template installs the
+[DiscVault launcher](https://github.com/helmerzNL/DiscVault-Launcher): one container that creates and updates the whole stack (PostgreSQL, API,
+worker, MCP) through the Docker socket and serves it on one port. That socket gives the launcher control over Docker on your server; the
+template says so. Stable and beta use their own folders, Compose project name, network and port, so they can run next to each other. The
+launcher does not pass the `DISCVAULT_OIDC_*` variables on yet, so the template does not offer OpenID Connect.
+
+Not included yet: **3D Print Pricing**. It also needs PostgreSQL 17 and has no launcher; it follows once it is decided how to offer it.
 
 ### Installing
 
@@ -26,7 +33,8 @@ that dependency; they follow once it is decided how to offer them (a separate da
 - **Before that**: download the XML file you want from [`templates/`](templates) into `/boot/config/plugins/dockerMan/templates-user/` on your Unraid
   server, then on the Docker tab choose *Add Container* and pick the template from the *Template* list.
 
-MealieShopper needs nothing else filled in: on the first start it guides you through security and the links with Mealie. Doorbell Map needs
+DiscVault asks for its folders (the defaults are fine), the timezone and, for passkeys, **RP_ID** and **RP_ORIGINS**; the first start takes a few
+minutes while the launcher pulls the images and creates the database. MealieShopper needs nothing else filled in: on the first start it guides you through security and the links with Mealie. Doorbell Map needs
 **Origin** (the https address you open it on), a **Setup code** and a **Session secret**; passkeys only work on an https address with a domain name,
 so put a reverse proxy with a certificate in front of it.
 
@@ -62,9 +70,13 @@ template en een beta-template met een eigen data-map en poort, zodat beide naast
 De tabel hierboven laat de apps, images, poorten en data-mappen zien. Alle images zijn publiek en gebouwd voor amd64 en arm64. Een beta kan de
 database aanpassen op een manier die de stabiele versie niet kan lezen: zet een beta nooit op de data-map van de stabiele app.
 
-Nog niet opgenomen: **DiscVault** en **3D Print Pricing**. Beide hebben een PostgreSQL 17-database naast de app nodig en de store kent geen manier
-om die afhankelijkheid vast te leggen; ze volgen zodra besloten is hoe we ze aanbieden (een aparte database-template, een Compose-stack of een
-alles-in-één image).
+**DiscVault** heeft een PostgreSQL-database naast de app nodig en de store kan zo'n afhankelijkheid niet vastleggen. Daarom installeert de template
+de [DiscVault-launcher](https://github.com/helmerzNL/DiscVault-Launcher): een container die de hele stack (PostgreSQL, API, worker, MCP) via de
+Docker-socket aanmaakt en bijwerkt en op een poort aanbiedt. Die socket geeft de launcher controle over Docker op je server; de template zegt dat.
+Stabiel en beta hebben eigen mappen, Compose-projectnaam, netwerk en poort, dus ze kunnen naast elkaar draaien. De launcher geeft de
+`DISCVAULT_OIDC_*`-variabelen nog niet door, dus de template biedt OpenID Connect niet aan.
+
+Nog niet opgenomen: **3D Print Pricing**. Het heeft ook PostgreSQL 17 nodig en heeft geen launcher; het volgt zodra besloten is hoe we het aanbieden.
 
 ### Installeren
 

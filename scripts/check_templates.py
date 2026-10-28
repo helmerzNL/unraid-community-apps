@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REQUIRED = ("Name", "Repository", "Registry", "Network", "Support", "Project", "Overview", "Category", "WebUI", "TemplateURL", "Icon", "Date")
-SECRET_WORDS = ("SECRET", "TOKEN", "API_KEY", "PASSWORD")
+SECRET_WORDS = ("SECRET", "TOKEN", "API_KEY", "PASSWORD", "ENCRYPTION_KEY")
 CATEGORY = re.compile(r"^(?:[A-Za-z]+:(?:[A-Za-z]+)? ?)+$")
 RAW = "https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main"
 
@@ -71,7 +71,8 @@ def check_template(path: Path, root_dir: Path, sources: dict) -> list[str]:
         if re.search(r"<|>", config.get("Description", "")):
             problems.append(f"{name}: Config {label!r}: no <...> in a Description (the store treats it as HTML)")
         target = config.get("Target", "")
-        if config.get("Type") == "Variable" and any(word in target.upper() for word in SECRET_WORDS) and config.get("Mask") != "true":
+        is_switch = "|" in config.get("Default", "")          # a dropdown (true|false) is a setting, not a secret, whatever its name says
+        if config.get("Type") == "Variable" and not is_switch and any(word in target.upper() for word in SECRET_WORDS) and config.get("Mask") != "true":
             problems.append(f"{name}: Config {label!r} ({target}) holds a secret and must have Mask=\"true\"")
         default = config.get("Default", "")
         value = (config.text or "").strip()
@@ -82,6 +83,13 @@ def check_template(path: Path, root_dir: Path, sources: dict) -> list[str]:
             problems.append(f"{name}: Config {label!r}: the value {value!r} differs from Default {default!r}")
         if config.get("Required") == "true" and config.get("Display") not in ("always", "always-hide"):
             problems.append(f"{name}: Config {label!r} is required and must be Display=\"always\"")
+    configs = {c.get("Target"): c for c in root.findall("Config")}
+    host_data = configs.get("DISCVAULT_DATA_DIR_HOST")
+    if host_data is not None and (configs.get("/data") is None or configs["/data"].get("Default") != host_data.get("Default")):
+        problems.append(f"{name}: DISCVAULT_DATA_DIR_HOST must be the same folder as the /data path")
+    for config in root.findall("Config"):
+        if config.get("Type") == "Path" and config.get("Target") != "/var/run/docker.sock" and not config.get("Default", "").startswith("/mnt/user/appdata/"):
+            problems.append(f"{name}: Config {config.get('Name')!r}: a Path default belongs under /mnt/user/appdata/")
     webui = text(root, "WebUI")
     ports = [c.get("Target") for c in root.findall("Config") if c.get("Type") == "Port"]
     match = re.search(r"\[PORT:(\d+)\]", webui)
@@ -108,7 +116,7 @@ def check_repository(root_dir: Path = ROOT, registry: bool = False) -> list[str]
         for suffix in ("", "-beta"):
             if not (root_dir / "templates" / f"{key}{suffix}.xml").is_file():
                 problems.append(f"templates/{key}{suffix}.xml is missing")
-    names, host_ports, paths = {}, {}, {}
+    names, host_ports, paths, stacks = {}, {}, {}, {}
     for path in files:
         problems += check_template(path, root_dir, sources)
         try:
@@ -124,10 +132,16 @@ def check_repository(root_dir: Path = ROOT, registry: bool = False) -> list[str]
                 other = host_ports.setdefault(config.get("Default"), path.name)
                 if other != path.name:
                     problems.append(f"{path.name}: host port {config.get('Default')} is also used by {other}")
-            if config.get("Type") == "Path" and config.get("Target") == "/data":
-                other = paths.setdefault(config.get("Default"), path.name)
+            folder = config.get("Default", "")
+            is_folder = (config.get("Type") == "Path" and folder.startswith("/mnt/user/appdata/")) or config.get("Target", "").endswith("_DIR_HOST")
+            if is_folder:
+                other = paths.setdefault(folder, path.name)
                 if other != path.name:
-                    problems.append(f"{path.name}: app data folder {config.get('Default')} is also used by {other}")
+                    problems.append(f"{path.name}: folder {folder} is also used by {other}")
+            if config.get("Target") in ("DISCVAULT_PROJECT_NAME", "DISCVAULT_NETWORK"):
+                other = stacks.setdefault((config.get("Target"), (config.text or "").strip()), path.name)
+                if other != path.name:
+                    problems.append(f"{path.name}: {config.get('Target')} {(config.text or '').strip()!r} is also used by {other}")
     if registry:
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         problems += check_registry(sources)

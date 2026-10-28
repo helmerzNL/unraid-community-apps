@@ -3,8 +3,9 @@
 
 Every key of `sources.json` has a stable template `templates/<key>.xml` and a generated `templates/<key>-beta.xml`. The beta template is the
 stable one with: the name "<name> (beta)", the `beta` tag of the image, `<Beta>true</Beta>` (so the store labels it), its own TemplateURL, its
-own app data folder (`<key>-beta`), the host port plus one, a hidden variable that makes the app show a BETA label, and a notice in the
-Overview. Edit the stable template, then run this script.
+own app data folders (every `/mnt/user/appdata/<key>...` folder gets `-beta` after the key), the host port plus one, a notice in the Overview and,
+per `sources.json`: a hidden variable that makes the app show a BETA label (`beta_env`) and values that must differ for a parallel install
+(`beta_overrides`, for example the Compose project name of a stack; a dropdown then starts on the new value). Edit the stable template, then run this script.
 
 Usage:
     python scripts/derive_beta.py            write the beta templates
@@ -53,9 +54,26 @@ def beta_template(stable: str, key: str, source: dict) -> str:
         line = re.sub(r'Default="(\d+)"', lambda m: f'Default="{int(m.group(1)) + 1}"', line, count=1)
         return re.sub(r">(\d+)</Config>$", lambda m: f">{int(m.group(1)) + 1}</Config>", line)
     text = re.sub(r'^  <Config [^\n]*Type="Port"[^\n]*</Config>$', next_port, text, flags=re.M)
-    label = (f'  <Config Name="Beta label" Target="{source["beta_env"]}" Default="beta" Mode="" Description="Makes the app show a BETA label. '
-             f'Do not change." Type="Variable" Display="always-hide" Required="false" Mask="false">beta</Config>\n')
-    return _once(r"</Container>", label + "</Container>", text)
+    for target, value in source.get("beta_overrides", {}).items():
+        text = _override(text, target, value)
+    if source.get("beta_env"):
+        label = (f'  <Config Name="Beta label" Target="{source["beta_env"]}" Default="beta" Mode="" Description="Makes the app show a BETA label. '
+                 f'Do not change." Type="Variable" Display="always-hide" Required="false" Mask="false">beta</Config>\n')
+        text = _once(r"</Container>", label + "</Container>", text)
+    return text
+
+
+def _override(text: str, target: str, value: str) -> str:
+    """Set the value of the Config entry with this Target; a dropdown keeps its other choices behind the new first one."""
+    pattern = re.compile(rf'(  <Config [^\n]*Target="{re.escape(target)}"[^\n]*Default=")([^"]*)("[^\n]*>)([^<]*)(</Config>)')
+    def replace(match: re.Match) -> str:
+        choices = [c for c in match.group(2).split("|") if c != value]
+        default = "|".join([value] + choices) if "|" in match.group(2) else value
+        return f"{match.group(1)}{default}{match.group(3)}{value}{match.group(5)}"
+    result, count = pattern.subn(replace, text)
+    if count != 1:
+        raise SystemExit(f"the stable template needs exactly one Config with Target {target!r} (found {count})")
+    return result
 
 
 def expected(root: Path = ROOT) -> dict[Path, str]:
