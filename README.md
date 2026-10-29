@@ -11,6 +11,8 @@ and a beta template with its own app data folder and port, so both can run next 
 |---|---|---|---|---|
 | [**DiscVault**](templates/discvault.xml) | Manager for your 4K UHD, Blu-ray and DVD collection (installs the DiscVault launcher, see below) | `ghcr.io/helmerznl/discvault-launcher:latest` | 6080 | `/mnt/user/appdata/discvault`, `discvault-postgres`, `discvault-launcher` |
 | [**DiscVault (beta)**](templates/discvault-beta.xml) | The development version | `ghcr.io/helmerznl/discvault-launcher:beta` | 6081 | `/mnt/user/appdata/discvault-beta`, `discvault-beta-postgres`, `discvault-beta-launcher` |
+| [**3D Print Pricing**](templates/printpricing.xml) | Cost price calculator and inventory for a 3D-print business | `ghcr.io/flux76hq/3dprint_pricing:latest` | 6280 | `/mnt/cache/appdata/printpricing` |
+| [**3D Print Pricing (beta)**](templates/printpricing-beta.xml) | The development version | `ghcr.io/flux76hq/3dprint_pricing:beta` | 6281 | `/mnt/cache/appdata/printpricing-beta` |
 | [**MealieShopper**](templates/mealieshopper.xml) | Week menu from Mealie to your supermarket basket | `ghcr.io/helmerznl/mealieshopper:latest` | 5959 | `/mnt/user/appdata/mealieshopper` |
 | [**MealieShopper (beta)**](templates/mealieshopper-beta.xml) | The development version | `ghcr.io/helmerznl/mealieshopper:beta` | 5960 | `/mnt/user/appdata/mealieshopper-beta` |
 | [**Doorbell Map**](templates/doorbell-map.xml) | Neighbourhood map of houses that do or do not want a visit | `ghcr.io/helmerznl/doorbell-map:latest` | 9888 | `/mnt/user/appdata/doorbell-map` |
@@ -25,7 +27,7 @@ worker, MCP) through the Docker socket and serves it on one port. That socket gi
 template says so. Stable and beta use their own folders, Compose project name, network and port, so they can run next to each other. The
 launcher does not pass the `DISCVAULT_OIDC_*` variables on yet, so the template does not offer OpenID Connect.
 
-Not included yet: **3D Print Pricing**. It also needs PostgreSQL 17 and has no launcher; it follows once it is decided how to offer it.
+**3D Print Pricing** is one container: since version 0.26.23 its database is a SQLite file in the app data folder, so nothing else has to be installed. That folder must be on a **local disk, not on `/mnt/user`**: SQLite can lose data on that FUSE share, which is why the template defaults to the cache pool (`/mnt/cache/appdata/printpricing`; use `/mnt/diskN/appdata/...` without a cache pool). The container warns at start-up when the folder is on such a file system. The **Setup code** and **Session secret** are required and have no default; make them with `openssl rand -hex 8` and `openssl rand -hex 32`. A password works on any address, passkeys need an https address with a domain name. The host port is 6280 (the container listens on 6080) because DiscVault uses 6080. This template is for new installations; an existing installation on the PostgreSQL releases is moved over by the app itself, see its operations guide (*Overstap naar SQLite*).
 
 ### Installing
 
@@ -76,7 +78,7 @@ Docker-socket aanmaakt en bijwerkt en op een poort aanbiedt. Die socket geeft de
 Stabiel en beta hebben eigen mappen, Compose-projectnaam, netwerk en poort, dus ze kunnen naast elkaar draaien. De launcher geeft de
 `DISCVAULT_OIDC_*`-variabelen nog niet door, dus de template biedt OpenID Connect niet aan.
 
-Nog niet opgenomen: **3D Print Pricing**. Het heeft ook PostgreSQL 17 nodig en heeft geen launcher; het volgt zodra besloten is hoe we het aanbieden.
+**3D Print Pricing** is één container: sinds versie 0.26.23 is de database een SQLite-bestand in de data-map, dus er hoeft niets anders geïnstalleerd te worden. Die map moet op een **lokale schijf staan, niet op `/mnt/user`**: SQLite kan op die FUSE-share gegevens verliezen. Daarom staat de template standaard op de cachepool (`/mnt/cache/appdata/printpricing`; zonder cachepool `/mnt/diskN/appdata/...`). De container waarschuwt bij het starten als de map op zo'n bestandssysteem staat. De **Setup code** en het **Session secret** zijn verplicht en hebben geen standaardwaarde; maak ze met `openssl rand -hex 8` en `openssl rand -hex 32`. Een wachtwoord werkt op elk adres, passkeys vragen om een https-adres met een domeinnaam. De hostpoort is 6280 (de container luistert op 6080) omdat DiscVault 6080 gebruikt. Deze template is voor nieuwe installaties; een bestaande installatie op de PostgreSQL-releases wordt door de app zelf overgezet, zie zijn handleiding (*Overstap naar SQLite*).
 
 ### Installeren
 

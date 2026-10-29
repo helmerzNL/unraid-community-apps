@@ -3,7 +3,7 @@
 
 Every key of `sources.json` has a stable template `templates/<key>.xml` and a generated `templates/<key>-beta.xml`. The beta template is the
 stable one with: the name "<name> (beta)", the `beta` tag of the image, `<Beta>true</Beta>` (so the store labels it), its own TemplateURL, its
-own app data folders (every `/mnt/user/appdata/<key>...` folder gets `-beta` after the key), the host port plus one, a notice in the Overview and,
+own app data folders (every `/mnt/<user|cache|diskN>/appdata/<key>...` folder gets `-beta` after the key), the host port plus one, a notice in the Overview and,
 per `sources.json`: a hidden variable that makes the app show a BETA label (`beta_env`) and values that must differ for a parallel install
 (`beta_overrides`, for example the Compose project name of a stack; a dropdown then starts on the new value). Edit the stable template, then run this script.
 
@@ -46,7 +46,7 @@ def beta_template(stable: str, key: str, source: dict) -> str:
     text = _once(r"(  <Privileged>[^<]*</Privileged>\n)", r"\1  <Beta>true</Beta>\n", text)
     text = _once(rf"/templates/{re.escape(key)}\.xml</TemplateURL>", f"/templates/{key}-beta.xml</TemplateURL>", text)
     text = _once(r"<Overview>", "<Overview>" + NOTICE.replace("\\", "\\\\"), text)
-    text = text.replace(f"/mnt/user/appdata/{key}", f"/mnt/user/appdata/{key}-beta")
+    text = re.sub(rf"(/mnt/[A-Za-z0-9]+/appdata/{re.escape(key)})", r"\1-beta", text)       # /mnt/user, /mnt/cache or /mnt/diskN
 
     def next_port(match: re.Match) -> str:
         """The host port plus one, in the Default attribute and in the value of the entry."""
