@@ -19,7 +19,7 @@ class RepositoryTest(unittest.TestCase):
 
     def test_every_app_has_a_stable_and_a_beta_template(self):
         names = {path.stem for path in (ROOT / "templates").glob("*.xml")}
-        self.assertEqual(names, {"discvault", "discvault-beta", "doorbell-map", "doorbell-map-beta", "mealieshopper", "mealieshopper-beta"})
+        self.assertEqual(names, {"discvault", "discvault-beta", "doorbell-map", "doorbell-map-beta", "mealieshopper", "mealieshopper-beta", "printpricing", "printpricing-beta"})
 
     def test_beta_matches_stable(self):
         self.assertEqual(derive_beta.differences(), [])
@@ -96,6 +96,43 @@ class DiscVaultStackTest(unittest.TestCase):
         self.assertFalse([t for t in self.by_target(self.stable) if "OIDC" in t])
 
 
+class PrintPricingTest(unittest.TestCase):
+    """3D Print Pricing keeps a SQLite file in its app data folder: that must be a local disk, and the secrets must be asked for."""
+
+    def setUp(self):
+        self.stable = ET.parse(ROOT / "templates" / "printpricing.xml").getroot()
+        self.beta = ET.parse(ROOT / "templates" / "printpricing-beta.xml").getroot()
+
+    def by_target(self, root):
+        return {c.get("Target"): c for c in root.findall("Config")}
+
+    def test_database_folder_is_not_on_the_fuse_share(self):
+        for root in (self.stable, self.beta):
+            folder = self.by_target(root)["/data"].get("Default")
+            self.assertTrue(folder.startswith("/mnt/cache/appdata/"), folder)
+
+    def test_beta_has_its_own_folder_port_and_label(self):
+        stable, beta = self.by_target(self.stable), self.by_target(self.beta)
+        self.assertEqual(beta["/data"].text, "/mnt/cache/appdata/printpricing-beta")
+        self.assertEqual((stable["6080"].text, beta["6080"].text), ("6280", "6281"))        # the container port stays 6080
+        self.assertEqual((beta["PRINTPRICING_TAG"].text, beta["PRINTPRICING_TAG"].get("Display")), ("beta", "always-hide"))
+        self.assertNotIn("PRINTPRICING_TAG", stable)
+
+    def test_secrets_are_required_masked_and_have_no_default(self):
+        for root in (self.stable, self.beta):
+            for target in ("SETUP_CODE", "SESSION_SECRET"):
+                entry = self.by_target(root)[target]
+                self.assertEqual((entry.get("Required"), entry.get("Mask"), entry.get("Default")), ("true", "true", ""), target)
+
+    def test_domain_is_optional_and_empty(self):
+        for target in ("RP_ID", "RP_ORIGINS"):
+            entry = self.by_target(self.stable)[target]
+            self.assertEqual((entry.get("Required"), entry.get("Default")), ("false", ""), target)
+
+    def test_no_postgresql_settings(self):
+        self.assertFalse([t for t in self.by_target(self.stable) if "POSTGRES" in t or "DATABASE_URL" in t])
+
+
 class DefectsAreCaughtTest(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -159,6 +196,18 @@ class DefectsAreCaughtTest(unittest.TestCase):
 
     def test_a_switch_named_password_is_not_a_secret(self):
         self.assertEqual([p for p in self.problems() if "SYNC_PASSWORD" in p], [])
+
+    def test_sqlite_folder_on_the_user_share_is_refused(self):
+        self.edit("printpricing.xml", "/mnt/cache/appdata/printpricing", "/mnt/user/appdata/printpricing")
+        self.assertTrue(any("FUSE" in p for p in self.problems()))
+
+    def test_unmasked_setup_code(self):
+        self.edit("printpricing.xml", 'Type="Variable" Display="always" Required="true" Mask="true"></Config>\n  <Config Name="Session secret"', 'Type="Variable" Display="always" Required="true" Mask="false"></Config>\n  <Config Name="Session secret"')
+        self.assertTrue(any("SETUP_CODE" in p for p in self.problems()))
+
+    def test_two_apps_cannot_share_a_host_port(self):
+        self.edit("printpricing.xml", 'Default="6280" Mode="tcp"', 'Default="6080" Mode="tcp"')
+        self.assertTrue(any("6080" in p for p in self.problems()))
 
     def test_missing_english_or_dutch(self):
         self.edit("mealieshopper.xml", "Nederlands:", "Dutch:")

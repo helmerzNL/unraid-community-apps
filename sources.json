@@ -17,5 +17,11 @@
     "app_repo": "helmerzNL/MealieShopper",
     "image": "ghcr.io/helmerznl/mealieshopper",
     "beta_env": "MEALIESHOPPER_TAG"
+  },
+  "printpricing": {
+    "app_repo": "Flux76HQ/3dprint_pricing",
+    "image": "ghcr.io/flux76hq/3dprint_pricing",
+    "beta_env": "PRINTPRICING_TAG",
+    "local_disk_data": true
   }
 }

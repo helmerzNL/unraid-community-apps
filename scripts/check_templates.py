@@ -15,7 +15,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REQUIRED = ("Name", "Repository", "Registry", "Network", "Support", "Project", "Overview", "Category", "WebUI", "TemplateURL", "Icon", "Date")
-SECRET_WORDS = ("SECRET", "TOKEN", "API_KEY", "PASSWORD", "ENCRYPTION_KEY")
+SECRET_WORDS = ("SECRET", "TOKEN", "API_KEY", "PASSWORD", "ENCRYPTION_KEY", "SETUP_CODE", "PRIVATE_KEY")
+APPDATA = re.compile(r"^/mnt/(user|cache|disk\d+)/appdata/")
+LOCAL_DISK = re.compile(r"^/mnt/(cache|disk\d+)/")
 CATEGORY = re.compile(r"^(?:[A-Za-z]+:(?:[A-Za-z]+)? ?)+$")
 RAW = "https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main"
 
@@ -88,8 +90,10 @@ def check_template(path: Path, root_dir: Path, sources: dict) -> list[str]:
     if host_data is not None and (configs.get("/data") is None or configs["/data"].get("Default") != host_data.get("Default")):
         problems.append(f"{name}: DISCVAULT_DATA_DIR_HOST must be the same folder as the /data path")
     for config in root.findall("Config"):
-        if config.get("Type") == "Path" and config.get("Target") != "/var/run/docker.sock" and not config.get("Default", "").startswith("/mnt/user/appdata/"):
-            problems.append(f"{name}: Config {config.get('Name')!r}: a Path default belongs under /mnt/user/appdata/")
+        if config.get("Type") == "Path" and config.get("Target") != "/var/run/docker.sock" and not APPDATA.match(config.get("Default", "")):
+            problems.append(f"{name}: Config {config.get('Name')!r}: a Path default belongs under /mnt/user, /mnt/cache or /mnt/diskN /appdata/")
+        if config.get("Target") == "/data" and sources[key].get("local_disk_data") and not LOCAL_DISK.match(config.get("Default", "")):
+            problems.append(f"{name}: the database is SQLite and must not be on /mnt/user (a FUSE share): use /mnt/cache/appdata/... or /mnt/diskN/appdata/...")
     webui = text(root, "WebUI")
     ports = [c.get("Target") for c in root.findall("Config") if c.get("Type") == "Port"]
     match = re.search(r"\[PORT:(\d+)\]", webui)
@@ -133,7 +137,7 @@ def check_repository(root_dir: Path = ROOT, registry: bool = False) -> list[str]
                 if other != path.name:
                     problems.append(f"{path.name}: host port {config.get('Default')} is also used by {other}")
             folder = config.get("Default", "")
-            is_folder = (config.get("Type") == "Path" and folder.startswith("/mnt/user/appdata/")) or config.get("Target", "").endswith("_DIR_HOST")
+            is_folder = (config.get("Type") == "Path" and bool(APPDATA.match(folder))) or config.get("Target", "").endswith("_DIR_HOST")
             if is_folder:
                 other = paths.setdefault(folder, path.name)
                 if other != path.name:
