@@ -17,7 +17,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
-  <Changes>### 1.0.34
+  <Changes>### 1.0.35
+- Version 1.0.35 of the app. / Versie 1.0.35 van de app.
+- Release notes / release-teksten: https://github.com/helmerzNL/Doorbell-Map/releases/tag/v1.0.35
+
+### 1.0.34
 - Version 1.0.34 of the app. / Versie 1.0.34 van de app.
 - Release notes / release-teksten: https://github.com/helmerzNL/Doorbell-Map/releases/tag/v1.0.34</Changes>
   <MinVer>6.12.0</MinVer>
