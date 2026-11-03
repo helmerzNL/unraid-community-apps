@@ -17,6 +17,9 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
+  <Changes>### 2.94.1
+- Version 2.94.1 of the app. / Versie 2.94.1 van de app.
+- Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v2.94.1</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Web UI port" Target="8000" Default="5959" Mode="tcp" Description="Port of the web interface (container port 8000). / Poort van de webinterface (containerpoort 8000)." Type="Port" Display="always" Required="true" Mask="false">5959</Config>
   <Config Name="App data" Target="/data" Default="/mnt/user/appdata/mealieshopper" Mode="rw" Description="Database and secret.key. Include the whole folder in your backups. / Database en secret.key. Neem de hele map mee in je back-ups." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/mealieshopper</Config>

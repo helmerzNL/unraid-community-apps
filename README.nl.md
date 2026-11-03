@@ -241,7 +241,21 @@ Pas alleen de stabiele template van een app aan; de beta-template wordt gegenere
 `Beta`-vlag waarmee de store hem labelt, eigen map, poort plus één, een verborgen variabele die het BETA-label laat zien, en een melding). De CI
 faalt als een beta-template is afgedreven.
 
-Een app toevoegen: zet hem in `sources.json`, schrijf `templates/<key>.xml` (kopieer een bestaande), zet het icoon in `icons/<key>.png` en
+### Versies
+
+De templates gebruiken de meebewegende tags `latest` en `beta`, dus Unraid biedt een update
+zelf aan zodra er een nieuw image is. Wat wel bijgewerkt wordt is het veld `<Changes>`, het wijzigingslogboek dat de store toont: de bovenste regel
+noemt de versie die de template levert. `scripts/sync_versions.py` schrijft dat, pas als het image van die versie gepubliceerd is; voor een beta is
+dat `<nieuwste release>-beta.<bouwtijd>`, met een link naar wat er sinds die release veranderde. `derive_beta.py` bewaart het eigen veld `<Changes>`
+van de beta-template. Elke 6 uur draait een geplande Claude Code-taak het
+script op `main` en opent of werkt één pull request bij vanaf de branch `automation/update-versions`; merge die om de versies in de store te zetten.
+
+```bash
+python scripts/sync_versions.py --check        # welke versies zouden worden vastgelegd
+python scripts/sync_versions.py                # leg ze vast
+```
+
+Een app toevoegen: zet hem in `sources.json` (met zijn `versions`), schrijf `templates/<key>.xml` (kopieer een bestaande), zet het icoon in `icons/<key>.png` en
 draai `scripts/derive_beta.py` en `scripts/check_templates.py`.
 
 ### De vermelding in de store (alleen de eigenaar)
