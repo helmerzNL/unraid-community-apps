@@ -7,6 +7,9 @@ own app data folders (every `/mnt/<user|cache|diskN>/appdata/<key>...` folder ge
 per `sources.json`: a hidden variable that makes the app show a BETA label (`beta_env`) and values that must differ for a parallel install
 (`beta_overrides`, for example the Compose project name of a stack; a dropdown then starts on the new value). Edit the stable template, then run this script.
 
+The one field that is not derived is `<Changes>`, the change log the store shows: it names the version a template delivers, and the beta delivers
+another version than the stable app. `scripts/sync_versions.py` writes it in both templates, and this script keeps the beta's own `<Changes>`.
+
 Usage:
     python scripts/derive_beta.py            write the beta templates
     python scripts/derive_beta.py --check    report beta templates that differ from what would be written (exit code 1)
@@ -29,6 +32,19 @@ NOTICE = (
 )
 
 
+CHANGES = re.compile(r"^  <Changes>.*?</Changes>\n", flags=re.S | re.M)
+
+
+def with_changes(text: str, block: str) -> str:
+    """The template (without a <Changes>) with this <Changes> block after its <Date>; an empty block adds nothing."""
+    if not block:
+        return text
+    date = re.search(r"^  <Date>[^<]*</Date>\n", text, flags=re.M)
+    if not date:
+        raise SystemExit("the template has no <Date> line to put <Changes> after")
+    return text[:date.end()] + block + text[date.end():]
+
+
 def sources(root: Path = ROOT) -> dict:
     return json.loads((root / "sources.json").read_text(encoding="utf-8"))
 
@@ -40,8 +56,9 @@ def _once(pattern: str, replacement: str, text: str) -> str:
     return result
 
 
-def beta_template(stable: str, key: str, source: dict) -> str:
-    text = _once(r"<Name>(.*?)</Name>", r"<Name>\1 (beta)</Name>", stable)
+def beta_template(stable: str, key: str, source: dict, current: str | None = None) -> str:
+    """The beta template made from the stable one; `current` is the beta template as it is now, whose <Changes> it keeps."""
+    text = _once(r"<Name>(.*?)</Name>", r"<Name>\1 (beta)</Name>", CHANGES.sub("", stable))
     text = _once(r"(<Repository>[^<]*):latest</Repository>", r"\1:beta</Repository>", text)
     text = _once(r"(  <Privileged>[^<]*</Privileged>\n)", r"\1  <Beta>true</Beta>\n", text)
     text = _once(rf"/templates/{re.escape(key)}\.xml</TemplateURL>", f"/templates/{key}-beta.xml</TemplateURL>", text)
@@ -60,7 +77,8 @@ def beta_template(stable: str, key: str, source: dict) -> str:
         label = (f'  <Config Name="Beta label" Target="{source["beta_env"]}" Default="beta" Mode="" Description="Makes the app show a BETA label. '
                  f'Do not change." Type="Variable" Display="always-hide" Required="false" Mask="false">beta</Config>\n')
         text = _once(r"</Container>", label + "</Container>", text)
-    return text
+    kept = CHANGES.search(current) if current else None
+    return with_changes(text, kept.group(0) if kept else "")
 
 
 def _override(text: str, target: str, value: str) -> str:
@@ -77,7 +95,10 @@ def _override(text: str, target: str, value: str) -> str:
 
 
 def expected(root: Path = ROOT) -> dict[Path, str]:
-    return {root / "templates" / f"{key}-beta.xml": beta_template((root / "templates" / f"{key}.xml").read_text(encoding="utf-8"), key, source)
+    def current(path: Path) -> str | None:
+        return path.read_text(encoding="utf-8") if path.is_file() else None
+    return {root / "templates" / f"{key}-beta.xml": beta_template((root / "templates" / f"{key}.xml").read_text(encoding="utf-8"), key, source,
+                                                                  current(root / "templates" / f"{key}-beta.xml"))
             for key, source in sources(root).items()}
 
 

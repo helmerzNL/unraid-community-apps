@@ -18,6 +18,9 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
+  <Changes>### 26.10.17-beta.202611031311
+- Beta build of 2026-11-03 13:11 UTC, after release 26.10.17. / Beta-build van 2026-11-03 13:11 UTC, na release 26.10.17.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/DiscVault/compare/v26.10.17...7304b676e4ebd8457ca94ddd020d3e1ab0cfffe9</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Release channel" Target="DISCVAULT_CHANNEL" Default="beta|latest|auto|manual" Mode="" Description="Which DiscVault release to run: latest (production), beta, auto (the channel built into this launcher image) or manual (the image below). / Welke DiscVault-release draait." Type="Variable" Display="always" Required="true" Mask="false">beta</Config>
   <Config Name="DiscVault image (manual channel only)" Target="DISCVAULT_IMAGE" Default="auto" Mode="" Description="Only used when the release channel is manual: a tag such as v26.10.17 or a full image reference; digest pinning is supported (ghcr.io/helmerznl/discvault:beta@sha256:DIGEST) and turns automatic updates off. / Alleen bij kanaal manual." Type="Variable" Display="advanced" Required="false" Mask="false">auto</Config>

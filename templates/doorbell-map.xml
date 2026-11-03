@@ -17,6 +17,9 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
+  <Changes>### 1.0.34
+- Version 1.0.34 of the app. / Versie 1.0.34 van de app.
+- Release notes / release-teksten: https://github.com/helmerzNL/Doorbell-Map/releases/tag/v1.0.34</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Web UI port" Target="9888" Default="9888" Mode="tcp" Description="Port of the web interface (container port 9888). / Poort van de webinterface (containerpoort 9888)." Type="Port" Display="always" Required="true" Mask="false">9888</Config>
   <Config Name="App data" Target="/data" Default="/mnt/user/appdata/doorbell-map" Mode="rw" Description="Houses, passkeys, settings and the automatic backups. / Huizen, passkeys, instellingen en de automatische back-ups." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/doorbell-map</Config>

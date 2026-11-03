@@ -17,6 +17,9 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
+  <Changes>### 26.10.17
+- Version 26.10.17 of the app. / Versie 26.10.17 van de app.
+- Release notes / release-teksten: https://github.com/helmerzNL/DiscVault/releases/tag/v26.10.17</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Release channel" Target="DISCVAULT_CHANNEL" Default="latest|auto|beta|manual" Mode="" Description="Which DiscVault release to run: latest (production), beta, auto (the channel built into this launcher image) or manual (the image below). / Welke DiscVault-release draait." Type="Variable" Display="always" Required="true" Mask="false">latest</Config>
   <Config Name="DiscVault image (manual channel only)" Target="DISCVAULT_IMAGE" Default="auto" Mode="" Description="Only used when the release channel is manual: a tag such as v26.10.17 or a full image reference; digest pinning is supported (ghcr.io/helmerznl/discvault:beta@sha256:DIGEST) and turns automatic updates off. / Alleen bij kanaal manual." Type="Variable" Display="advanced" Required="false" Mask="false">auto</Config>

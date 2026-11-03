@@ -17,6 +17,9 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-29</Date>
+  <Changes>### 0.26.23
+- Version 0.26.23 of the app. / Versie 0.26.23 van de app.
+- Release notes / release-teksten: https://github.com/Flux76HQ/3dprint_pricing/releases/tag/v0.26.23</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Web UI port" Target="6080" Default="6280" Mode="tcp" Description="Host port of the web interface (the container listens on 6080). 6280 because DiscVault uses 6080. / Hostpoort van de webinterface (de container luistert op 6080)." Type="Port" Display="always" Required="true" Mask="false">6280</Config>
   <Config Name="App data" Target="/data" Default="/mnt/cache/appdata/printpricing" Mode="rw" Description="The database (db/, one SQLite file) and the uploaded STL/3MF files (uploads/). Use the cache pool or an array disk (/mnt/cache/... or /mnt/diskN/...), NOT /mnt/user/...: SQLite can lose data on that FUSE share. Back up the whole folder. / De database en de geüploade bestanden. Gebruik de cachepool of een array-schijf, NIET /mnt/user." Type="Path" Display="always" Required="true" Mask="false">/mnt/cache/appdata/printpricing</Config>

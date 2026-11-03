@@ -6,22 +6,38 @@
       "DISCVAULT_CHANNEL": "beta",
       "DISCVAULT_PROJECT_NAME": "discvault_beta_stack",
       "DISCVAULT_NETWORK": "discvault-beta-stack"
+    },
+    "versions": {
+      "stable": {"tag": "^v(26\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/discvault:{version}"},
+      "beta": {"tag": "^v(26\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/discvault:beta", "branch": "release/v26-beta"}
     }
   },
   "doorbell-map": {
     "app_repo": "helmerzNL/Doorbell-Map",
     "image": "ghcr.io/helmerznl/doorbell-map",
-    "beta_env": "DOORBELL_MAP_TAG"
+    "beta_env": "DOORBELL_MAP_TAG",
+    "versions": {
+      "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/doorbell-map:v{version}"},
+      "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/doorbell-map:beta", "branch": "beta"}
+    }
   },
   "mealieshopper": {
     "app_repo": "helmerzNL/MealieShopper",
     "image": "ghcr.io/helmerznl/mealieshopper",
-    "beta_env": "MEALIESHOPPER_TAG"
+    "beta_env": "MEALIESHOPPER_TAG",
+    "versions": {
+      "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/mealieshopper:{version}"},
+      "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+-beta)$", "image": "ghcr.io/helmerznl/mealieshopper:{version}"}
+    }
   },
   "printpricing": {
     "app_repo": "Flux76HQ/3dprint_pricing",
     "image": "ghcr.io/flux76hq/3dprint_pricing",
     "beta_env": "PRINTPRICING_TAG",
-    "local_disk_data": true
+    "local_disk_data": true,
+    "versions": {
+      "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/flux76hq/3dprint_pricing:{version}"},
+      "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/flux76hq/3dprint_pricing:beta", "branch": "beta"}
+    }
   }
 }
