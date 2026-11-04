@@ -18,7 +18,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
-  <Changes>### 2.97.0-beta
+  <Changes>### 3.0.0-beta
+- Version 3.0.0-beta of the app. / Versie 3.0.0-beta van de app.
+- Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v3.0.0-beta
+
+### 2.97.0-beta
 - Version 2.97.0-beta of the app. / Versie 2.97.0-beta van de app.
 - Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v2.97.0-beta</Changes>
   <MinVer>6.12.0</MinVer>

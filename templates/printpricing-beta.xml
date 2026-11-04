@@ -18,7 +18,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-29</Date>
-  <Changes>### 0.26.23-beta.202611031636
+  <Changes>### 0.26.23-beta.202611031910
+- Beta build of 2026-11-03 19:10 UTC, after release 0.26.23. / Beta-build van 2026-11-03 19:10 UTC, na release 0.26.23.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/Flux76HQ/3dprint_pricing/commits/beta
+
+### 0.26.23-beta.202611031636
 - Beta build of 2026-11-03 16:36 UTC, after release 0.26.23. / Beta-build van 2026-11-03 16:36 UTC, na release 0.26.23.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/Flux76HQ/3dprint_pricing/commits/beta</Changes>
   <MinVer>6.12.0</MinVer>
