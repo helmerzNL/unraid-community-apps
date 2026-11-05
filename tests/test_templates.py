@@ -133,6 +133,18 @@ class PrintPricingTest(unittest.TestCase):
         self.assertFalse([t for t in self.by_target(self.stable) if "POSTGRES" in t or "DATABASE_URL" in t])
 
 
+class DoorbellMapTest(unittest.TestCase):
+    """Since version 1.0.35 Doorbell Map follows the address it is opened on, so Origin is optional; the two secrets are not."""
+
+    def test_origin_is_optional_and_the_secrets_are_required(self):
+        for name in ("doorbell-map.xml", "doorbell-map-beta.xml"):
+            by_target = {c.get("Target"): c for c in ET.parse(ROOT / "templates" / name).getroot().findall("Config")}
+            self.assertEqual((by_target["ORIGIN"].get("Required"), by_target["ORIGIN"].get("Default")), ("false", ""), name)
+            for target in ("SETUP_TOKEN", "SESSION_SECRET"):
+                entry = by_target[target]
+                self.assertEqual((entry.get("Required"), entry.get("Mask")), ("true", "true"), (name, target))
+
+
 class DefectsAreCaughtTest(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())

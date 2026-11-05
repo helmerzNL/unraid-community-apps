@@ -115,8 +115,8 @@ Unraid-server, kies daarna op het tabblad **Docker** *Add Container* en kies de 
 - **3D Print Pricing**: open de app en doorloop de onboarding: de setupcode die je invulde, je naam, een passkey of een wachtwoord, en de
   herstelcodes. Een wachtwoord werkt op elk adres, passkeys vragen om een https-adres met een domeinnaam.
 - **MealieShopper**: bij de eerste start loopt hij je door de beveiliging en de koppelingen met Mealie en je supermarkten.
-- **Doorbell Map**: open het Origin-adres met `/beheer` erachter, typ de setupcode en maak je passkey. Passkeys werken alleen op een
-  https-adres met een domeinnaam, dus zet er een reverse proxy met certificaat voor.
+- **Doorbell Map**: open de kaart met `/beheer` erachter, typ de setupcode en kies een gebruikersnaam met een wachtwoord of, op een https-adres,
+  een passkey. Een wachtwoord werkt op elk adres, ook `http://<server>:9888` in je eigen netwerk; passkeys vragen om een https-adres met een domeinnaam.
 
 ## Configuratie
 
@@ -127,7 +127,7 @@ Alles stel je in het formulier van de template in, waar elk veld zichzelf uitleg
 | DiscVault | De mappen (de standaardwaarden zijn prima) en **Timezone** (`TZ`) | Voor passkeys: **Passkey domain** (`RP_ID`) en **Passkey addresses** (`RP_ORIGINS`); leeg betekent localhost, en dat werkt alleen op de server zelf. **Password sign-in** (`LEGACY_AUTH_ENABLED`) zet je zelf aan. Blijven ze leeg, dan maakt de launcher het PostgreSQL-wachtwoord en het JWT-geheim bij de eerste start, in `/config/stack.env`. De launcher geeft de `DISCVAULT_OIDC_*`-variabelen nog niet door, dus de template biedt OpenID Connect niet aan. |
 | 3D Print Pricing | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)), **Setup code** (`SETUP_CODE`) en **Session secret** (`SESSION_SECRET`). Beide hebben geen standaardwaarde: maak ze met `openssl rand -hex 8` en `openssl rand -hex 32` | Voor passkeys: `RP_ID` en `RP_ORIGINS`. Pushmeldingen vragen om een VAPID-sleutelpaar; het veld legt uit hoe je dat maakt. |
 | MealieShopper | Niets | Elk veld is optioneel: bij de eerste start loopt de app je door de beveiliging en de koppeling met Mealie. Een koppeling met Mealie die je in de app maakt, gaat voor de velden. |
-| Doorbell Map | **Origin** (`ORIGIN`, het https-adres waarop je hem opent, precies zoals in de adresbalk), **Setup code** (`SETUP_TOKEN`, minstens 16 tekens, bijvoorbeeld `openssl rand -hex 12`) en **Session secret** (`SESSION_SECRET`, bijvoorbeeld `openssl rand -hex 32`) | **Passkey domain** (`RP_ID`) is optioneel: leeg betekent de hostnaam van Origin, en dat klopt bijna altijd. |
+| Doorbell Map | **Setup code** (`SETUP_TOKEN`, minstens 16 tekens, bijvoorbeeld `openssl rand -hex 12`) en **Session secret** (`SESSION_SECRET`, bijvoorbeeld `openssl rand -hex 32`) | **Origin** (`ORIGIN`) is optioneel sinds versie 1.0.35: leeg volgt de kaart het adres waarop hij wordt geopend; vul hem in (precies zoals in de adresbalk) als hij alleen op dat adres hoort te werken. Ook **Passkey domain** (`RP_ID`) is optioneel: leeg betekent de hostnaam van Origin of van het adres in de browser, en dat klopt bijna altijd. |
 
 Houd een session secret vast als hij eenmaal is ingesteld: een nieuwe waarde logt iedereen uit.
 
@@ -158,7 +158,7 @@ Elke app bewaart alles in zijn eigen data-map (zie [De apps](#de-apps)); een bet
 | DiscVault | `discvault`: posters, profielen en back-ups. `discvault-postgres`: de PostgreSQL-database. `discvault-launcher`: de status van de launcher, het gegenereerde Compose-bestand, de gegenereerde geheimen en de opstartlogboeken |
 | 3D Print Pricing | `db/`: de database, één SQLite-bestand. `uploads/`: de geüploade STL- en 3MF-bestanden |
 | MealieShopper | De database en `secret.key` |
-| Doorbell Map | De huizen, passkeys, instellingen en de automatische back-ups van de app |
+| Doorbell Map | De huizen, de gebruikers met hun wachtwoorden en passkeys, instellingen en de automatische back-ups van de app |
 
 De map van 3D Print Pricing moet op een **lokale schijf staan, niet op `/mnt/user`**: SQLite kan op die FUSE-share gegevens verliezen.
 Daarom staat de template standaard op de cachepool (`/mnt/cache/appdata/printpricing`; zonder cachepool `/mnt/diskN/appdata/...`). De
