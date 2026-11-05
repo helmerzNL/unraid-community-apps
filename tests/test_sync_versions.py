@@ -73,11 +73,14 @@ class SyncTest(unittest.TestCase):
         self.record("doorbell-map", sv.entry("1.0.34", "helmerzNL/Doorbell-Map", {}))
         self.record("doorbell-map-beta", sv.entry("1.0.34-beta.202611031626", "helmerzNL/Doorbell-Map", {}, {"created": "2026-11-03T16:26:00Z"}, "1.0.34"))
         self.tags = {"helmerzNL/DiscVault": ["v26.10.17"], "helmerzNL/Doorbell-Map": ["v1.0.34", "v1.0.35"],
-                     "helmerzNL/MealieShopper": ["v2.94.1", "v2.98.0-beta"], "Flux76HQ/3dprint_pricing": ["v0.26.23"]}
+                     "helmerzNL/MealieShopper": ["v2.94.1", "v2.98.0-beta"], "Flux76HQ/3dprint_pricing": ["v0.26.23"],
+                     "helmerzNL/NAS-Storage-Analyzer": ["v0.2.1"]}
         self.published = {"ghcr.io/helmerznl/discvault:26.10.17", "ghcr.io/helmerznl/doorbell-map:v1.0.35", "ghcr.io/helmerznl/mealieshopper:2.94.1",
-                          "ghcr.io/helmerznl/mealieshopper:2.98.0-beta", "ghcr.io/flux76hq/3dprint_pricing:0.26.23"}
+                          "ghcr.io/helmerznl/mealieshopper:2.98.0-beta", "ghcr.io/flux76hq/3dprint_pricing:0.26.23",
+                          "ghcr.io/helmerznl/nas-storage-analyzer-aio:0.2.1"}
         self.builds = {"ghcr.io/helmerznl/discvault:beta": "2026-11-04T08:00:00Z", "ghcr.io/helmerznl/doorbell-map:beta": "2026-11-04T09:15:00Z",
-                       "ghcr.io/flux76hq/3dprint_pricing:beta": "2026-11-04T10:30:00Z"}
+                       "ghcr.io/flux76hq/3dprint_pricing:beta": "2026-11-04T10:30:00Z",
+                       "ghcr.io/helmerznl/nas-storage-analyzer-aio:beta": "2026-11-05T13:00:00Z"}
 
     def record(self, name, text):
         path = self.tmp / "templates" / f"{name}.xml"

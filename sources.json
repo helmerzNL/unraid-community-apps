@@ -39,5 +39,14 @@
       "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/flux76hq/3dprint_pricing:{version}"},
       "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/flux76hq/3dprint_pricing:beta", "branch": "beta"}
     }
+  },
+  "nas-storage-analyzer": {
+    "app_repo": "helmerzNL/NAS-Storage-Analyzer",
+    "image": "ghcr.io/helmerznl/nas-storage-analyzer-aio",
+    "local_disk_data": true,
+    "versions": {
+      "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/nas-storage-analyzer-aio:{version}"},
+      "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/nas-storage-analyzer-aio:beta", "branch": "beta"}
+    }
   }
 }

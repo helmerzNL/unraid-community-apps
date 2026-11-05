@@ -90,8 +90,13 @@ def check_template(path: Path, root_dir: Path, sources: dict) -> list[str]:
     if host_data is not None and (configs.get("/data") is None or configs["/data"].get("Default") != host_data.get("Default")):
         problems.append(f"{name}: DISCVAULT_DATA_DIR_HOST must be the same folder as the /data path")
     for config in root.findall("Config"):
-        if config.get("Type") == "Path" and config.get("Target") != "/var/run/docker.sock" and not APPDATA.match(config.get("Default", "")):
-            problems.append(f"{name}: Config {config.get('Name')!r}: a Path default belongs under /mnt/user, /mnt/cache or /mnt/diskN /appdata/")
+        read_only = config.get("Mode", "").split(",")[0] == "ro"
+        if config.get("Type") == "Path" and read_only and not config.get("Default", "").startswith("/mnt/"):
+            problems.append(f"{name}: Config {config.get('Name')!r}: a read-only Path default must be a folder under /mnt/ (the shares), not the host")
+        elif config.get("Type") == "Path" and config.get("Target") != "/var/run/docker.sock" and not read_only \
+                and not APPDATA.match(config.get("Default", "")):
+            # A folder the app writes to belongs in appdata; a folder it only reads (the shares a scanner looks at) may be elsewhere.
+            problems.append(f"{name}: Config {config.get('Name')!r}: a writable Path default belongs under /mnt/user, /mnt/cache or /mnt/diskN /appdata/")
         if config.get("Target") == "/data" and sources[key].get("local_disk_data") and not LOCAL_DISK.match(config.get("Default", "")):
             problems.append(f"{name}: the database is SQLite and must not be on /mnt/user (a FUSE share): use /mnt/cache/appdata/... or /mnt/diskN/appdata/...")
     webui = text(root, "WebUI")

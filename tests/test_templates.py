@@ -19,7 +19,7 @@ class RepositoryTest(unittest.TestCase):
 
     def test_every_app_has_a_stable_and_a_beta_template(self):
         names = {path.stem for path in (ROOT / "templates").glob("*.xml")}
-        self.assertEqual(names, {"discvault", "discvault-beta", "doorbell-map", "doorbell-map-beta", "mealieshopper", "mealieshopper-beta", "printpricing", "printpricing-beta"})
+        self.assertEqual(names, {"discvault", "discvault-beta", "doorbell-map", "doorbell-map-beta", "mealieshopper", "mealieshopper-beta", "nas-storage-analyzer", "nas-storage-analyzer-beta", "printpricing", "printpricing-beta"})
 
     def test_beta_matches_stable(self):
         self.assertEqual(derive_beta.differences(), [])
@@ -145,6 +145,44 @@ class DoorbellMapTest(unittest.TestCase):
                 self.assertEqual((entry.get("Required"), entry.get("Mask")), ("true", "true"), (name, target))
 
 
+class NasStorageAnalyzerTest(unittest.TestCase):
+    """NAS Storage Analyzer runs its all-in-one image: the database on a local disk, the shares read-only, the encryption key required."""
+
+    def setUp(self):
+        self.stable = ET.parse(ROOT / "templates" / "nas-storage-analyzer.xml").getroot()
+        self.beta = ET.parse(ROOT / "templates" / "nas-storage-analyzer-beta.xml").getroot()
+
+    def by_target(self, root):
+        return {c.get("Target"): c for c in root.findall("Config")}
+
+    def test_all_in_one_images(self):
+        self.assertEqual(self.stable.find("Repository").text, "ghcr.io/helmerznl/nas-storage-analyzer-aio:latest")
+        self.assertEqual(self.beta.find("Repository").text, "ghcr.io/helmerznl/nas-storage-analyzer-aio:beta")
+
+    def test_the_shares_are_read_only_at_the_same_path_the_app_may_scan(self):
+        for root in (self.stable, self.beta):
+            shares, entries = self.by_target(root)["/mnt/user"], self.by_target(root)
+            self.assertEqual((shares.get("Default"), shares.get("Mode")), ("/mnt/user", "ro"))
+            self.assertEqual(entries["NASSA_SHARES_ROOT"].text, "/mnt/user", "the app may only scan below the folder it gets")
+
+    def test_database_on_a_local_disk_and_its_own_for_the_beta(self):
+        stable, beta = self.by_target(self.stable)["/data"], self.by_target(self.beta)["/data"]
+        self.assertEqual(stable.text, "/mnt/cache/appdata/nas-storage-analyzer")
+        self.assertEqual(beta.text, "/mnt/cache/appdata/nas-storage-analyzer-beta")
+
+    def test_the_encryption_key_is_required_masked_and_has_no_default(self):
+        for root in (self.stable, self.beta):
+            key = self.by_target(root)["NASSA_ENCRYPTION_KEY"]
+            self.assertEqual((key.get("Required"), key.get("Mask"), key.get("Default")), ("true", "true", ""))
+
+    def test_port_and_shared_memory(self):
+        stable, beta = self.by_target(self.stable)["8080"], self.by_target(self.beta)["8080"]
+        self.assertEqual((stable.text, beta.text), ("6480", "6481"))
+        for root in (self.stable, self.beta):
+            self.assertIn("--shm-size=256m", root.find("ExtraParams").text)
+            self.assertEqual(root.find("Privileged").text, "false", "the shares are local on Unraid: no rights to mount")
+
+
 class DefectsAreCaughtTest(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -224,6 +262,14 @@ class DefectsAreCaughtTest(unittest.TestCase):
     def test_missing_english_or_dutch(self):
         self.edit("mealieshopper.xml", "Nederlands:", "Dutch:")
         self.assertTrue(any("Nederlands" in p for p in self.problems()))
+
+    def test_a_writable_folder_outside_appdata_is_refused(self):
+        self.edit("nas-storage-analyzer.xml", 'Default="/mnt/user" Mode="ro"', 'Default="/mnt/user" Mode="rw"')
+        self.assertTrue(any("writable Path" in p for p in self.problems()))
+
+    def test_a_read_only_folder_must_be_below_mnt(self):
+        self.edit("nas-storage-analyzer.xml", 'Target="/mnt/user" Default="/mnt/user" Mode="ro"', 'Target="/mnt/user" Default="/" Mode="ro"')
+        self.assertTrue(any("read-only Path" in p for p in self.problems()))
 
     def test_empty_profile(self):
         path = self.tmp / "ca_profile.xml"
