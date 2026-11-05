@@ -114,8 +114,8 @@ then on the **Docker** tab choose *Add Container* and pick the template from the
 - **3D Print Pricing**: open the app and go through the onboarding: the setup code you filled in, your name, a passkey or a password, and
   the recovery codes. A password works on any address, passkeys need an https address with a domain name.
 - **MealieShopper**: on the first start it guides you through security and the links with Mealie and your supermarkets.
-- **Doorbell Map**: open the Origin address followed by `/beheer`, type the setup code and create your passkey. Passkeys only work on an https address with a
-  domain name, so put a reverse proxy with a certificate in front of it.
+- **Doorbell Map**: open the map followed by `/beheer`, type the setup code and choose a username with a password or, on an https address, a
+  passkey. A password works on any address, also `http://<server>:9888` on your own network; passkeys need an https address with a domain name.
 
 ## Configuration
 
@@ -126,7 +126,7 @@ Everything is set in the template form, where every field explains itself. What 
 | DiscVault | The folders (the defaults are fine) and **Timezone** (`TZ`) | For passkeys: **Passkey domain** (`RP_ID`) and **Passkey addresses** (`RP_ORIGINS`); empty means localhost, which only works on the server itself. **Password sign-in** (`LEGACY_AUTH_ENABLED`) is opt-in. Left empty, the PostgreSQL password and the JWT secret are made by the launcher on the first start, in `/config/stack.env`. The launcher does not pass the `DISCVAULT_OIDC_*` variables on yet, so the template does not offer OpenID Connect. |
 | 3D Print Pricing | **App data** on a local disk (see [Data and backups](#data-and-backups)), **Setup code** (`SETUP_CODE`) and **Session secret** (`SESSION_SECRET`). Both have no default: make them with `openssl rand -hex 8` and `openssl rand -hex 32` | For passkeys: `RP_ID` and `RP_ORIGINS`. Push notifications need a VAPID key pair; the field explains how to make one. |
 | MealieShopper | Nothing | Every field is optional: on the first start the app guides you through security and the links with Mealie. A Mealie link made in the app takes precedence over the fields. |
-| Doorbell Map | **Origin** (`ORIGIN`, the https address you open it on, exactly as in the address bar), **Setup code** (`SETUP_TOKEN`, at least 16 characters, for example `openssl rand -hex 12`) and **Session secret** (`SESSION_SECRET`, for example `openssl rand -hex 32`) | **Passkey domain** (`RP_ID`) is optional: empty means the host name of Origin, which is almost always right. |
+| Doorbell Map | **Setup code** (`SETUP_TOKEN`, at least 16 characters, for example `openssl rand -hex 12`) and **Session secret** (`SESSION_SECRET`, for example `openssl rand -hex 32`) | **Origin** (`ORIGIN`) is optional since version 1.0.35: empty, the map follows the address it is opened on; fill it in (exactly as in the address bar) when it should only work on that one address. **Passkey domain** (`RP_ID`) is optional too: empty means the host name of Origin or of the address in the browser, which is almost always right. |
 
 Keep a session secret fixed once it is set: a new value signs everyone out.
 
@@ -156,7 +156,7 @@ Every app keeps everything in its own app data folder (see [The apps](#the-apps)
 | DiscVault | `discvault`: posters, profiles and backups. `discvault-postgres`: the PostgreSQL database. `discvault-launcher`: the launcher's state, the generated Compose file, the generated secrets and the boot logs |
 | 3D Print Pricing | `db/`: the database, one SQLite file. `uploads/`: the uploaded STL and 3MF files |
 | MealieShopper | The database and `secret.key` |
-| Doorbell Map | The houses, passkeys, settings and the app's automatic backups |
+| Doorbell Map | The houses, the users and their passwords and passkeys, settings and the app's automatic backups |
 
 The folder of 3D Print Pricing must be on a **local disk, not on `/mnt/user`**: SQLite can lose data on that FUSE share, which is why the
 template defaults to the cache pool (`/mnt/cache/appdata/printpricing`; use `/mnt/diskN/appdata/...` without a cache pool). The container
