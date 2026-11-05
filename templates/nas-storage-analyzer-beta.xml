@@ -18,6 +18,9 @@
   <ExtraParams>--shm-size=256m</ExtraParams>
   <PostArgs/>
   <Date>2026-11-05</Date>
+  <Changes>### 0.3.0-beta.202611051432
+- Beta build of 2026-11-05 14:32 UTC, after release 0.3.0. / Beta-build van 2026-11-05 14:32 UTC, na release 0.3.0.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/NAS-Storage-Analyzer/compare/v0.3.0...8d26b9c4913bbe2ed88bd41b61c2a877d2835e09</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Web UI port" Target="8080" Default="6481" Mode="tcp" Description="Host port of the web interface (the container listens on 8080). / Hostpoort van de webinterface (de container luistert op 8080)." Type="Port" Display="always" Required="true" Mask="false">6481</Config>
   <Config Name="App data" Target="/data" Default="/mnt/cache/appdata/nas-storage-analyzer-beta" Mode="rw" Description="The PostgreSQL database (postgres/). Use the cache pool or an array disk (/mnt/cache/... or /mnt/diskN/...), NOT /mnt/user/...: a database does not belong on that FUSE share. / De database. Gebruik de cachepool of een array-schijf, NIET /mnt/user." Type="Path" Display="always" Required="true" Mask="false">/mnt/cache/appdata/nas-storage-analyzer-beta</Config>
