@@ -145,6 +145,19 @@ class DoorbellMapTest(unittest.TestCase):
                 self.assertEqual((entry.get("Required"), entry.get("Mask")), ("true", "true"), (name, target))
 
 
+class MealieShopperTest(unittest.TestCase):
+    """Since 3.14.0 MealieShopper reads ANTHROPIC_BASE_URL and OPENAI_BASE_URL (mealieshopper/ai_review.py): another address for the AI review,
+    for example a LiteLLM proxy. Empty means the default address, so they are optional, advanced and empty."""
+
+    def test_the_ai_addresses_are_optional_advanced_and_empty(self):
+        for name in ("mealieshopper.xml", "mealieshopper-beta.xml"):
+            by_target = {c.get("Target"): c for c in ET.parse(ROOT / "templates" / name).getroot().findall("Config")}
+            for target in ("ANTHROPIC_BASE_URL", "OPENAI_BASE_URL"):
+                entry = by_target[target]
+                self.assertEqual((entry.get("Type"), entry.get("Display"), entry.get("Required"), entry.get("Default"), entry.text),
+                                 ("Variable", "advanced", "false", "", None), (name, target))
+
+
 class NasStorageAnalyzerTest(unittest.TestCase):
     """NAS Storage Analyzer runs its all-in-one image: the database on a local disk, the shares read-only, the encryption key required."""
 
