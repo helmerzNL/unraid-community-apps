@@ -145,6 +145,17 @@ class DoorbellMapTest(unittest.TestCase):
                 self.assertEqual((entry.get("Required"), entry.get("Mask")), ("true", "true"), (name, target))
 
 
+class DoorbellMapBackupsTest(unittest.TestCase):
+    """Since 2.0.0 Doorbell Map keeps 50 backups (it was 200) and removes older ones at start-up; MAX_BACKUPS keeps more. Empty is the app's own default."""
+
+    def test_max_backups_is_optional_advanced_and_empty(self):
+        for name in ("doorbell-map.xml", "doorbell-map-beta.xml"):
+            by_target = {c.get("Target"): c for c in ET.parse(ROOT / "templates" / name).getroot().findall("Config")}
+            entry = by_target["MAX_BACKUPS"]
+            self.assertEqual((entry.get("Type"), entry.get("Display"), entry.get("Required"), entry.get("Default"), entry.text),
+                             ("Variable", "advanced", "false", "", None), name)
+
+
 class MealieShopperTest(unittest.TestCase):
     """Since 3.14.0 MealieShopper reads ANTHROPIC_BASE_URL and OPENAI_BASE_URL (mealieshopper/ai_review.py): another address for the AI review,
     for example a LiteLLM proxy. Empty means the default address, so they are optional, advanced and empty."""
