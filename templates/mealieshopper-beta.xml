@@ -18,7 +18,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
-  <Changes>### 4.19.0-beta
+  <Changes>### 4.20.0-beta
+- Version 4.20.0-beta of the app. / Versie 4.20.0-beta van de app.
+- Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v4.20.0-beta
+
+### 4.19.0-beta
 - Version 4.19.0-beta of the app. / Versie 4.19.0-beta van de app.
 - Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v4.19.0-beta
 
@@ -52,11 +56,7 @@
 
 ### 3.8.0-beta
 - Version 3.8.0-beta of the app. / Versie 3.8.0-beta van de app.
-- Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v3.8.0-beta
-
-### 3.6.2-beta
-- Version 3.6.2-beta of the app. / Versie 3.6.2-beta van de app.
-- Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v3.6.2-beta</Changes>
+- Release notes / release-teksten: https://github.com/helmerzNL/MealieShopper/releases/tag/v3.8.0-beta</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Web UI port" Target="8000" Default="5960" Mode="tcp" Description="Port of the web interface (container port 8000). / Poort van de webinterface (containerpoort 8000)." Type="Port" Display="always" Required="true" Mask="false">5960</Config>
   <Config Name="App data" Target="/data" Default="/mnt/user/appdata/mealieshopper-beta" Mode="rw" Description="Database and secret.key. Include the whole folder in your backups. / Database en secret.key. Neem de hele map mee in je back-ups." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/mealieshopper-beta</Config>

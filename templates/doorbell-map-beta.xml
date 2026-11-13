@@ -18,7 +18,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
-  <Changes>### 2.0.2-beta.202611121710
+  <Changes>### 2.0.3-beta.202611121710
+- Beta build of 2026-11-12 17:10 UTC, after release 2.0.3. / Beta-build van 2026-11-12 17:10 UTC, na release 2.0.3.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/Doorbell-Map/compare/v2.0.3...8fa35024a20840bbf44c6764006f6d1f4bcd9713
+
+### 2.0.2-beta.202611121710
 - Beta build of 2026-11-12 17:10 UTC, after release 2.0.2. / Beta-build van 2026-11-12 17:10 UTC, na release 2.0.2.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/Doorbell-Map/compare/v2.0.2...3bf8b024aa2026f591a0d6457a31cfd671c07c80
 
