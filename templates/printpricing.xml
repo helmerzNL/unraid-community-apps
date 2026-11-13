@@ -17,7 +17,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-29</Date>
-  <Changes>### 0.27.1
+  <Changes>### 1.0.0
+- Version 1.0.0 of the app. / Versie 1.0.0 van de app.
+- Release notes / release-teksten: https://github.com/Flux76HQ/3dprint_pricing/releases/tag/v1.0.0
+
+### 0.27.1
 - Version 0.27.1 of the app. / Versie 0.27.1 van de app.
 - Release notes / release-teksten: https://github.com/Flux76HQ/3dprint_pricing/releases/tag/v0.27.1
 
