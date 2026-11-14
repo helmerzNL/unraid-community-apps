@@ -18,7 +18,11 @@
   <ExtraParams>--shm-size=256m</ExtraParams>
   <PostArgs/>
   <Date>2026-11-05</Date>
-  <Changes>### 0.3.1-beta.202611101441
+  <Changes>### 0.3.1-beta.202611141557
+- Beta build of 2026-11-14 15:57 UTC, after release 0.3.1. / Beta-build van 2026-11-14 15:57 UTC, na release 0.3.1.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/NAS-Storage-Analyzer/compare/v0.3.1...86f5fd74af7752431d0feac03937dcaa249c7789
+
+### 0.3.1-beta.202611101441
 - Beta build of 2026-11-10 14:41 UTC, after release 0.3.1. / Beta-build van 2026-11-10 14:41 UTC, na release 0.3.1.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/NAS-Storage-Analyzer/compare/v0.3.1...6a45b49149a244c4e892568b106806a2d49decc1
 
