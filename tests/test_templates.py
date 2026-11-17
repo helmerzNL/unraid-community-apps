@@ -168,6 +168,16 @@ class MealieShopperTest(unittest.TestCase):
                 self.assertEqual((entry.get("Type"), entry.get("Display"), entry.get("Required"), entry.get("Default"), entry.text),
                                  ("Variable", "advanced", "false", "", None), (name, target))
 
+    def test_the_sqlite_database_is_on_a_local_disk_and_its_wal_can_be_switched_off(self):
+        """Since 4.26.0 the database runs in SQLite WAL, which needs a shared-memory file next to it: not on the /mnt/user FUSE share.
+        MEALIESHOPPER_SQLITE_WAL=false is for a data folder on a network share."""
+        for name, folder in (("mealieshopper.xml", "mealieshopper"), ("mealieshopper-beta.xml", "mealieshopper-beta")):
+            by_target = {c.get("Target"): c for c in ET.parse(ROOT / "templates" / name).getroot().findall("Config")}
+            data = by_target["/data"]
+            self.assertEqual((data.get("Default"), data.text), (f"/mnt/cache/appdata/{folder}",) * 2, name)
+            wal = by_target["MEALIESHOPPER_SQLITE_WAL"]
+            self.assertEqual((wal.get("Display"), wal.get("Required"), wal.get("Default"), wal.text), ("advanced", "false", "true|false", "true"), name)
+
 
 class NasStorageAnalyzerTest(unittest.TestCase):
     """NAS Storage Analyzer runs its all-in-one image: the database on a local disk, the shares read-only, the encryption key required."""

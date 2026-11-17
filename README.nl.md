@@ -87,8 +87,8 @@ proberen wat eraan komt zonder aan je stabiele installatie te komen.
 | [**DiscVault (beta)**](templates/discvault-beta.xml) | De ontwikkelversie | `ghcr.io/helmerznl/discvault-launcher:beta` | 6081 | `/mnt/user/appdata/discvault-beta`, `discvault-beta-postgres`, `discvault-beta-launcher` |
 | [**3D Print Pricing**](templates/printpricing.xml) | Kostprijscalculator en voorraadbeheer voor een 3D-printbedrijf | `ghcr.io/flux76hq/3dprint_pricing:latest` | 6280 | `/mnt/cache/appdata/printpricing` |
 | [**3D Print Pricing (beta)**](templates/printpricing-beta.xml) | De ontwikkelversie | `ghcr.io/flux76hq/3dprint_pricing:beta` | 6281 | `/mnt/cache/appdata/printpricing-beta` |
-| [**MealieShopper**](templates/mealieshopper.xml) | Van weekmenu in Mealie naar je boodschappenmandje | `ghcr.io/helmerznl/mealieshopper:latest` | 5959 | `/mnt/user/appdata/mealieshopper` |
-| [**MealieShopper (beta)**](templates/mealieshopper-beta.xml) | De ontwikkelversie | `ghcr.io/helmerznl/mealieshopper:beta` | 5960 | `/mnt/user/appdata/mealieshopper-beta` |
+| [**MealieShopper**](templates/mealieshopper.xml) | Van weekmenu in Mealie naar je boodschappenmandje | `ghcr.io/helmerznl/mealieshopper:latest` | 5959 | `/mnt/cache/appdata/mealieshopper` |
+| [**MealieShopper (beta)**](templates/mealieshopper-beta.xml) | De ontwikkelversie | `ghcr.io/helmerznl/mealieshopper:beta` | 5960 | `/mnt/cache/appdata/mealieshopper-beta` |
 | [**Doorbell Map**](templates/doorbell-map.xml) | Wijkkaart van huizen die wel of geen bezoek aan de deur willen | `ghcr.io/helmerznl/doorbell-map:latest` | 9888 | `/mnt/user/appdata/doorbell-map` |
 | [**Doorbell Map (beta)**](templates/doorbell-map-beta.xml) | De ontwikkelversie | `ghcr.io/helmerznl/doorbell-map:beta` | 9889 | `/mnt/user/appdata/doorbell-map-beta` |
 | [**NAS Storage Analyzer**](templates/nas-storage-analyzer.xml) | Opslaganalyse van je shares, per share, map en bestandstype, alleen-lezen | `ghcr.io/helmerznl/nas-storage-analyzer-aio:latest` | 6480 | `/mnt/cache/appdata/nas-storage-analyzer` |
@@ -131,7 +131,7 @@ Alles stel je in het formulier van de template in, waar elk veld zichzelf uitleg
 |---|---|---|
 | DiscVault | De mappen (de standaardwaarden zijn prima) en **Timezone** (`TZ`) | Voor passkeys: **Passkey domain** (`RP_ID`) en **Passkey addresses** (`RP_ORIGINS`); leeg betekent localhost, en dat werkt alleen op de server zelf. **Password sign-in** (`LEGACY_AUTH_ENABLED`) zet je zelf aan. Blijven ze leeg, dan maakt de launcher het PostgreSQL-wachtwoord en het JWT-geheim bij de eerste start, in `/config/stack.env`. De launcher geeft de `DISCVAULT_OIDC_*`-variabelen nog niet door, dus de template biedt OpenID Connect niet aan. |
 | 3D Print Pricing | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)), **Setup code** (`SETUP_CODE`) en **Session secret** (`SESSION_SECRET`). Beide hebben geen standaardwaarde: maak ze met `openssl rand -hex 8` en `openssl rand -hex 32` | Voor passkeys: `RP_ID` en `RP_ORIGINS`. Pushmeldingen vragen om een VAPID-sleutelpaar; het veld legt uit hoe je dat maakt. |
-| MealieShopper | Niets | Elk veld is optioneel: bij de eerste start loopt de app je door de beveiliging en de koppeling met Mealie. Een koppeling met Mealie die je in de app maakt, gaat voor de velden. |
+| MealieShopper | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)) | Elk ander veld is optioneel: bij de eerste start loopt de app je door de beveiliging en de koppeling met Mealie. Een koppeling met Mealie die je in de app maakt, gaat voor de velden. |
 | NAS Storage Analyzer | **App data** op een lokale schijf en **Encryption key** (`NASSA_ENCRYPTION_KEY`, maak hem met `openssl rand -base64 32` en bewaar een kopie: hij versleutelt de opgeslagen SMB-wachtwoorden) | De shares onder `/mnt/user` worden alleen-lezen op hetzelfde pad doorgegeven; **Shares group** (`NASSA_SHARES_GID`, 100) laat de app shares van `nobody:users` lezen. De container draait PostgreSQL, de webinterface en de scan-worker samen (het all-in-one image van de app) en krijgt `--shm-size=256m`. Passkeys vragen om **Passkey domain**, **Passkey addresses** en https. |
 | Doorbell Map | **Setup code** (`SETUP_TOKEN`, minstens 16 tekens, bijvoorbeeld `openssl rand -hex 12`) en **Session secret** (`SESSION_SECRET`, bijvoorbeeld `openssl rand -hex 32`) | **Origin** (`ORIGIN`) is optioneel sinds versie 1.0.35: leeg volgt de kaart het adres waarop hij wordt geopend; vul hem in (precies zoals in de adresbalk) als hij alleen op dat adres hoort te werken. Ook **Passkey domain** (`RP_ID`) is optioneel: leeg betekent de hostnaam van Origin of van het adres in de browser, en dat klopt bijna altijd. |
 
@@ -167,8 +167,8 @@ Elke app bewaart alles in zijn eigen data-map (zie [De apps](#de-apps)); een bet
 | Doorbell Map | De huizen, de gebruikers met hun wachtwoorden en passkeys, instellingen en de automatische back-ups van de app |
 | NAS Storage Analyzer | `postgres/`: de PostgreSQL-database. De encryptiesleutel staat er niet in: bewaar hem bij je template-instellingen |
 
-De mappen van 3D Print Pricing en NAS Storage Analyzer moeten op een **lokale schijf staan, niet op `/mnt/user`**: een database hoort niet op
-die FUSE-share (SQLite kan er gegevens verliezen, PostgreSQL wordt er traag). Daarom staan beide templates standaard op de cachepool
+De mappen van 3D Print Pricing, MealieShopper en NAS Storage Analyzer moeten op een **lokale schijf staan, niet op `/mnt/user`**: een database hoort
+niet op die FUSE-share (SQLite kan er gegevens verliezen, PostgreSQL wordt er traag). Daarom staan deze templates standaard op de cachepool
 (`/mnt/cache/appdata/<app>`; zonder cachepool `/mnt/diskN/appdata/...`). De container van 3D Print Pricing waarschuwt bij het starten als de map
 op zo'n bestandssysteem staat.
 
