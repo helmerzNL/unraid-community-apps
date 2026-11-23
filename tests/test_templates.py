@@ -19,7 +19,8 @@ class RepositoryTest(unittest.TestCase):
 
     def test_every_app_has_a_stable_and_a_beta_template(self):
         names = {path.stem for path in (ROOT / "templates").glob("*.xml")}
-        self.assertEqual(names, {"discvault", "discvault-beta", "doorbell-map", "doorbell-map-beta", "mealieshopper", "mealieshopper-beta", "nas-storage-analyzer", "nas-storage-analyzer-beta", "printpricing", "printpricing-beta"})
+        self.assertEqual(names, {"discvault", "discvault-beta", "doorbell-map", "doorbell-map-beta", "mealieshopper", "mealieshopper-beta", "nas-storage-analyzer", "nas-storage-analyzer-beta", "printpricing", "printpricing-beta",
+                                 "spoolman", "spoolman-beta", "haspelsync", "haspelsync-beta"})
 
     def test_beta_matches_stable(self):
         self.assertEqual(derive_beta.differences(), [])
@@ -179,6 +180,23 @@ class MealieShopperTest(unittest.TestCase):
             self.assertEqual((wal.get("Display"), wal.get("Required"), wal.get("Default"), wal.text), ("advanced", "false", "true|false", "true"), name)
 
 
+class MealieShopperSettingsTest(unittest.TestCase):
+    """The settings MealieShopper reads from its environment (README.en.md, .env.unraid.example), each starting on the app's own default, so an
+    installation that never opens them behaves as without them."""
+
+    DEFAULTS = {"MEALIESHOPPER_PRICE_INDEX": "true", "MEALIESHOPPER_IMAGE_PREFETCH": "true", "MEALIESHOPPER_OFFERS_RECIPES": "false",
+                "MEALIESHOPPER_SQLITE_MMAP_MB": "1024", "MEALIESHOPPER_AUDIT_BODIES": "true", "MEALIESHOPPER_AUDIT_BODY_CHARS": "4000",
+                "MEALIESHOPPER_SESSION_DAYS": "90", "MEALIESHOPPER_TELEMETRY": "false", "MEALIESHOPPER_TELEMETRY_SLOW_MS": "500"}
+
+    def test_optional_advanced_and_on_the_default_of_the_app(self):
+        for name in ("mealieshopper.xml", "mealieshopper-beta.xml"):
+            by_target = {c.get("Target"): c for c in ET.parse(ROOT / "templates" / name).getroot().findall("Config")}
+            for target, value in self.DEFAULTS.items():
+                entry = by_target[target]
+                self.assertEqual((entry.get("Display"), entry.get("Required"), entry.text), ("advanced", "false", value), (name, target))
+                self.assertEqual(entry.get("Default").split("|")[0], value, (name, target))
+
+
 class NasStorageAnalyzerTest(unittest.TestCase):
     """NAS Storage Analyzer runs its all-in-one image: the database on a local disk, the shares read-only, the encryption key required."""
 
@@ -215,6 +233,73 @@ class NasStorageAnalyzerTest(unittest.TestCase):
         for root in (self.stable, self.beta):
             self.assertIn("--shm-size=256m", root.find("ExtraParams").text)
             self.assertEqual(root.find("Privileged").text, "false", "the shares are local on Unraid: no rights to mount")
+
+
+class SpoolmanTest(unittest.TestCase):
+    """Spoolman (Donkie/Spoolman) keeps its SQLite database in /home/app/.local/share/spoolman and runs as the user PUID/PGID name; its beta is the
+    moving `edge` image of its master branch. Its port in the container is 8000; on the host it gets 7912, where the 3D-print tools expect it."""
+
+    def setUp(self):
+        self.stable = ET.parse(ROOT / "templates" / "spoolman.xml").getroot()
+        self.beta = ET.parse(ROOT / "templates" / "spoolman-beta.xml").getroot()
+
+    def by_target(self, root):
+        return {c.get("Target"): c for c in root.findall("Config")}
+
+    def test_images_and_the_branch_the_beta_names(self):
+        self.assertEqual(self.stable.find("Repository").text, "ghcr.io/donkie/spoolman:latest")
+        self.assertEqual(self.beta.find("Repository").text, "ghcr.io/donkie/spoolman:edge")
+        self.assertIn("built from its master branch", self.beta.find("Overview").text)
+        self.assertIn("gebouwd vanaf de master-branch", self.beta.find("Overview").text)
+
+    def test_the_database_is_on_a_local_disk_and_its_own_for_the_beta(self):
+        stable, beta = (self.by_target(root)["/home/app/.local/share/spoolman"] for root in (self.stable, self.beta))
+        self.assertEqual((stable.text, beta.text), ("/mnt/cache/appdata/spoolman", "/mnt/cache/appdata/spoolman-beta"))
+
+    def test_it_writes_as_nobody_users(self):
+        for root in (self.stable, self.beta):
+            entries = self.by_target(root)
+            self.assertEqual((entries["PUID"].text, entries["PGID"].text), ("99", "100"))
+
+    def test_ports(self):
+        self.assertEqual((self.by_target(self.stable)["8000"].text, self.by_target(self.beta)["8000"].text), ("7912", "7913"))
+        self.assertEqual(self.stable.find("WebUI").text, "http://[IP]:[PORT:8000]")
+
+    def test_the_settings_start_on_the_defaults_of_spoolman(self):
+        entries = self.by_target(self.stable)
+        self.assertEqual({target: entries[target].text for target in ("SPOOLMAN_LOGGING_LEVEL", "SPOOLMAN_AUTOMATIC_BACKUP", "SPOOLMAN_UPDATE_CHECK")},
+                         {"SPOOLMAN_LOGGING_LEVEL": "INFO", "SPOOLMAN_AUTOMATIC_BACKUP": "TRUE", "SPOOLMAN_UPDATE_CHECK": "TRUE"})
+        for target in ("SPOOLMAN_BASE_PATH", "SPOOLMAN_CORS_ORIGIN", "SPOOLMAN_ALLOWED_HOSTS"):
+            self.assertEqual((entries[target].get("Display"), entries[target].get("Default"), entries[target].text), ("advanced", "", None), target)
+
+
+class HaspelSyncTest(unittest.TestCase):
+    """HaspelSync (Rdiger-36/HaspelSync) runs as the image's `node` user since 1.4.0 and refuses folders it cannot write. On Unraid it runs as
+    nobody:users (--user 99:100), the owner of the appdata folders Unraid makes; its beta is the moving `dev` image of its main branch."""
+
+    def setUp(self):
+        self.stable = ET.parse(ROOT / "templates" / "haspelsync.xml").getroot()
+        self.beta = ET.parse(ROOT / "templates" / "haspelsync-beta.xml").getroot()
+
+    def by_target(self, root):
+        return {c.get("Target"): c for c in root.findall("Config")}
+
+    def test_images(self):
+        self.assertEqual(self.stable.find("Repository").text, "ghcr.io/rdiger-36/haspelsync:latest")
+        self.assertEqual(self.beta.find("Repository").text, "ghcr.io/rdiger-36/haspelsync:dev")
+
+    def test_it_runs_as_nobody_users(self):
+        for root in (self.stable, self.beta):
+            self.assertEqual(root.find("ExtraParams").text, "--user 99:100")
+
+    def test_own_folders_for_the_beta(self):
+        for root, folder in ((self.stable, "haspelsync"), (self.beta, "haspelsync-beta")):
+            entries = self.by_target(root)
+            self.assertEqual((entries["/app/printers"].text, entries["/app/logs"].text),
+                             (f"/mnt/user/appdata/{folder}/printers", f"/mnt/user/appdata/{folder}/logs"))
+
+    def test_ports(self):
+        self.assertEqual((self.by_target(self.stable)["4000"].text, self.by_target(self.beta)["4000"].text), ("4000", "4001"))
 
 
 class DefectsAreCaughtTest(unittest.TestCase):
@@ -284,6 +369,15 @@ class DefectsAreCaughtTest(unittest.TestCase):
     def test_sqlite_folder_on_the_user_share_is_refused(self):
         self.edit("printpricing.xml", "/mnt/cache/appdata/printpricing", "/mnt/user/appdata/printpricing")
         self.assertTrue(any("FUSE" in p for p in self.problems()))
+
+    def test_a_database_in_another_folder_than_data_is_checked_too(self):
+        # Spoolman's database is not in /data: sources.json names its folder (data_target).
+        self.edit("spoolman.xml", "/mnt/cache/appdata/spoolman", "/mnt/user/appdata/spoolman")
+        self.assertTrue(any("FUSE" in p for p in self.problems()))
+
+    def test_a_beta_on_the_beta_tag_where_its_image_has_another(self):
+        self.edit("spoolman-beta.xml", "ghcr.io/donkie/spoolman:edge", "ghcr.io/donkie/spoolman:beta")
+        self.assertTrue(any("ghcr.io/donkie/spoolman:edge" in p for p in self.problems()))
 
     def test_unmasked_setup_code(self):
         self.edit("printpricing.xml", 'Type="Variable" Display="always" Required="true" Mask="true"></Config>\n  <Config Name="Session secret"', 'Type="Variable" Display="always" Required="true" Mask="false"></Config>\n  <Config Name="Session secret"')

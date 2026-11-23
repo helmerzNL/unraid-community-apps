@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Spoolman (beta)</Name>
+  <Repository>ghcr.io/donkie/spoolman:edge</Repository>
+  <Registry>https://github.com/Donkie/Spoolman/pkgs/container/spoolman</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Beta>true</Beta>
+  <Support>https://github.com/Donkie/Spoolman/issues</Support>
+  <Project>https://github.com/Donkie/Spoolman</Project>
+  <Overview>Beta (English): the development version of the app, built from its master branch. It can be unstable and can change the database in ways the stable version cannot read. It has its own app data folder and port, so it runs next to the stable app. Do not point it at the data of the stable app.[br][br]Bèta (Nederlands): de ontwikkelversie van de app, gebouwd vanaf de master-branch. Hij kan onstabiel zijn en de database aanpassen op een manier die de stabiele versie niet kan lezen. Hij heeft een eigen data-map en poort, dus hij draait naast de stabiele app. Gebruik de data van de stabiele app niet voor de beta.[br][br]English: Spoolman is an inventory of your 3D-printer filament: every spool, what it is made of and how much is left on it, with what each print uses booked on the right spool. Klipper/Moonraker, OctoPrint, HaspelSync (for the AMS of a Bambu Lab printer, also in this repository) and 3D Print Pricing talk to it on the same address. Spoolman is made by Donkie and its contributors; this template only runs the published image, so a problem in Spoolman itself belongs in its own repository. Spoolman has no login of its own: everybody who can reach the port can read and change the inventory, so keep the port on your home network and do not forward it on your router. Put the app data on the cache pool or on an array disk, not on /mnt/user: the database is SQLite and does not belong on that FUSE share.[br][br]Nederlands: Spoolman is een voorraad van je 3D-printerfilament: elke spoel, waar hij van gemaakt is en hoeveel er nog op zit, met wat elke print verbruikt op de juiste spoel geboekt. Klipper/Moonraker, OctoPrint, HaspelSync (voor de AMS van een Bambu Lab-printer, ook in deze repository) en 3D Print Pricing praten er op hetzelfde adres mee. Spoolman is gemaakt door Donkie en de andere bijdragers; deze template draait alleen het gepubliceerde image, dus een probleem in Spoolman zelf hoort in de eigen repository. Spoolman heeft geen eigen inlog: iedereen die de poort bereikt kan de voorraad lezen en aanpassen, dus houd de poort binnen je thuisnetwerk en zet hem niet open in je router. Zet de data-map op de cachepool of op een schijf van de array, niet op /mnt/user: de database is SQLite en hoort niet op die FUSE-share.</Overview>
+  <Category>Tools: Productivity:</Category>
+  <WebUI>http://[IP]:[PORT:8000]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/templates/spoolman-beta.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/icons/spoolman.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <Date>2026-11-23</Date>
+  <Changes>### 0.27.1-beta.202611221041
+- Beta build of 2026-11-22 10:41 UTC, after release 0.27.1. / Beta-build van 2026-11-22 10:41 UTC, na release 0.27.1.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/Donkie/Spoolman/compare/v0.27.1...13c972d831373d095e703e91e02f9cce7ee2a32f</Changes>
+  <MinVer>6.12.0</MinVer>
+  <Config Name="Web UI port" Target="8000" Default="7913" Mode="tcp" Description="Port of the web interface and the API (container port 8000). The tools that book filament use http://your-server:7912. / Poort van de webinterface en de API (containerpoort 8000)." Type="Port" Display="always" Required="true" Mask="false">7913</Config>
+  <Config Name="App data" Target="/home/app/.local/share/spoolman" Default="/mnt/cache/appdata/spoolman-beta" Mode="rw" Description="The SQLite database, its nightly backups (backups/) and the log. Use the cache pool or an array disk (/mnt/cache/... or /mnt/diskN/...), NOT /mnt/user/...: SQLite can lose data on that FUSE share. / De SQLite-database, de nachtelijke back-ups en het log. Gebruik de cachepool of een array-schijf, NIET /mnt/user." Type="Path" Display="always" Required="true" Mask="false">/mnt/cache/appdata/spoolman-beta</Config>
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User Spoolman runs as and writes its files as: 99 is nobody, the owner of Unraid's appdata. / Gebruiker waaronder Spoolman draait en schrijft: 99 is nobody, de eigenaar van appdata op Unraid." Type="Variable" Display="advanced" Required="false" Mask="false">99</Config>
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group Spoolman runs as: 100 is users. / Groep waaronder Spoolman draait: 100 is users." Type="Variable" Display="advanced" Required="false" Mask="false">100</Config>
+  <Config Name="Log level" Target="SPOOLMAN_LOGGING_LEVEL" Default="INFO|DEBUG|WARNING|ERROR" Mode="" Description="How much Spoolman writes to its log. / Hoeveel Spoolman in zijn log schrijft." Type="Variable" Display="advanced" Required="false" Mask="false">INFO</Config>
+  <Config Name="Nightly backup" Target="SPOOLMAN_AUTOMATIC_BACKUP" Default="TRUE|FALSE" Mode="" Description="A copy of the database every night in backups/ of the app data; the five newest are kept. / Elke nacht een kopie van de database in backups/; de vijf nieuwste blijven bewaard." Type="Variable" Display="advanced" Required="false" Mask="false">TRUE</Config>
+  <Config Name="Update check" Target="SPOOLMAN_UPDATE_CHECK" Default="TRUE|FALSE" Mode="" Description="Spoolman shows when a newer release exists. It never updates itself; Unraid does that. / Spoolman meldt een nieuwere release; bijwerken doet Unraid." Type="Variable" Display="advanced" Required="false" Mask="false">TRUE</Config>
+  <Config Name="Base path" Target="SPOOLMAN_BASE_PATH" Default="" Mode="" Description="Optional: the path Spoolman lives under behind a reverse proxy, for example /spoolman. Empty for the root of its own address. / Optioneel: het pad achter een reverse proxy, bijvoorbeeld /spoolman." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Allowed origins (CORS)" Target="SPOOLMAN_CORS_ORIGIN" Default="" Mode="" Description="Optional: the web addresses of other tools that call Spoolman from the browser, comma-separated, for example http://mainsail.local. / Optioneel: de webadressen van andere tools die Spoolman vanuit de browser aanroepen." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Allowed host names" Target="SPOOLMAN_ALLOWED_HOSTS" Default="" Mode="" Description="Optional: when set, Spoolman only answers on these host names (comma-separated), for example spoolman.example.com. Empty answers on every name. / Optioneel: Spoolman antwoordt dan alleen op deze hostnamen." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+</Container>

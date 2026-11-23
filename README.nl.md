@@ -7,9 +7,9 @@
 
 # Unraid Community Applications templates by Helmer
 
-**De zelf te hosten apps van helmerzNL en Flux76, klaar om te installeren uit de app-store van Unraid.**
+**De zelf te hosten apps van helmerzNL en Flux76, en de 3D-printtools Spoolman en HaspelSync, klaar om te installeren uit de app-store van Unraid.**
 
-Templates voor de [Unraid](https://unraid.net) Community Applications-store: DiscVault, 3D Print Pricing, MealieShopper, Doorbell Map en NAS Storage Analyzer, elk als stabiele en als beta-app die naast elkaar draaien.
+Templates voor de [Unraid](https://unraid.net) Community Applications-store: DiscVault, 3D Print Pricing, MealieShopper, Doorbell Map en NAS Storage Analyzer, en Spoolman en HaspelSync (door anderen gemaakt, hier verpakt), elk als stabiele en als beta-app die naast elkaar draaien.
 
 🇳🇱 **Nederlands** · 🇬🇧 [English](README.md)
 
@@ -37,6 +37,10 @@ Templates voor de [Unraid](https://unraid.net) Community Applications-store: Dis
     <td align="center" valign="top" width="20%"><a href="https://github.com/helmerzNL/MealieShopper"><img src="icons/mealieshopper.png" width="72" alt=""><br><b>MealieShopper</b></a><br><sub>Van weekmenu naar boodschappenmandje</sub></td>
     <td align="center" valign="top" width="20%"><a href="https://github.com/helmerzNL/Doorbell-Map"><img src="icons/doorbell-map.png" width="72" alt=""><br><b>Doorbell Map</b></a><br><sub>Wijkkaart voor deur-aan-deuracties</sub></td>
     <td align="center" valign="top" width="20%"><a href="https://github.com/helmerzNL/NAS-Storage-Analyzer"><img src="icons/nas-storage-analyzer.png" width="72" alt=""><br><b>NAS Storage Analyzer</b></a><br><sub>Opslaganalyse van je shares, alleen-lezen</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="20%"><a href="https://github.com/Donkie/Spoolman"><img src="icons/spoolman.png" width="72" alt=""><br><b>Spoolman</b></a><br><sub>Voorraad van je filamentspoelen (door Donkie)</sub></td>
+    <td align="center" valign="top" width="20%"><a href="https://github.com/Rdiger-36/HaspelSync"><img src="icons/haspelsync.png" width="72" alt=""><br><b>HaspelSync</b></a><br><sub>AMS van Bambu Lab gelijk met Spoolman (door Rdiger-36)</sub></td>
   </tr>
 </table>
 
@@ -69,7 +73,8 @@ proberen wat eraan komt zonder aan je stabiele installatie te komen.
 
 ## Wat kan het?
 
-- **Vijf apps op één plek**: DiscVault, 3D Print Pricing, MealieShopper, Doorbell Map en NAS Storage Analyzer, allemaal in de store als *Helmer's Repository*.
+- **Zeven apps op één plek**: DiscVault, 3D Print Pricing, MealieShopper, Doorbell Map en NAS Storage Analyzer, plus Spoolman en HaspelSync voor je
+  3D-printer, allemaal in de store als *Helmer's Repository*. Spoolman en HaspelSync zijn door anderen gemaakt; deze repository verpakt ze alleen.
 - **Stabiel en beta naast elkaar**: elke beta heeft een eigen naam, data-map en poort, zodat beide tegelijk draaien.
 - **Weinig in te vullen**: verstandige standaardwaarden, verplichte velden alleen waar een app niet zonder kan, en elk geheim gemaskeerd in
   het formulier.
@@ -93,10 +98,14 @@ proberen wat eraan komt zonder aan je stabiele installatie te komen.
 | [**Doorbell Map (beta)**](templates/doorbell-map-beta.xml) | De ontwikkelversie | `ghcr.io/helmerznl/doorbell-map:beta` | 9889 | `/mnt/user/appdata/doorbell-map-beta` |
 | [**NAS Storage Analyzer**](templates/nas-storage-analyzer.xml) | Opslaganalyse van je shares, per share, map en bestandstype, alleen-lezen | `ghcr.io/helmerznl/nas-storage-analyzer-aio:latest` | 6480 | `/mnt/cache/appdata/nas-storage-analyzer` |
 | [**NAS Storage Analyzer (beta)**](templates/nas-storage-analyzer-beta.xml) | De ontwikkelversie | `ghcr.io/helmerznl/nas-storage-analyzer-aio:beta` | 6481 | `/mnt/cache/appdata/nas-storage-analyzer-beta` |
+| [**Spoolman**](templates/spoolman.xml) | Voorraad van je filamentspoelen voor de 3D-printer, door [Donkie](https://github.com/Donkie/Spoolman) | `ghcr.io/donkie/spoolman:latest` | 7912 | `/mnt/cache/appdata/spoolman` |
+| [**Spoolman (beta)**](templates/spoolman-beta.xml) | De ontwikkelversie (`edge`, gebouwd vanaf de `master`-branch) | `ghcr.io/donkie/spoolman:edge` | 7913 | `/mnt/cache/appdata/spoolman-beta` |
+| [**HaspelSync**](templates/haspelsync.xml) | Houdt Spoolman gelijk met de AMS van een Bambu Lab-printer, door [Rdiger-36](https://github.com/Rdiger-36/HaspelSync) | `ghcr.io/rdiger-36/haspelsync:latest` | 4000 | `/mnt/user/appdata/haspelsync` |
+| [**HaspelSync (beta)**](templates/haspelsync-beta.xml) | De ontwikkelversie (`dev`, gebouwd vanaf de `main`-branch) | `ghcr.io/rdiger-36/haspelsync:dev` | 4001 | `/mnt/user/appdata/haspelsync-beta` |
 
 Alle images zijn publiek en gebouwd voor amd64 en arm64. **3D Print Pricing** is één container: sinds versie 0.26.23 is de database een
 SQLite-bestand in de data-map, dus er hoeft niets anders geïnstalleerd te worden. De hostpoort is 6280 (de container luistert op 6080) omdat
-DiscVault 6080 gebruikt.
+DiscVault 6080 gebruikt. **Spoolman** luistert in de container op 8000 en krijgt hostpoort 7912, de poort waarop de 3D-printtools hem verwachten.
 
 ## Snel starten
 
@@ -122,6 +131,10 @@ Unraid-server, kies daarna op het tabblad **Docker** *Add Container* en kies de 
   een passkey. Een wachtwoord werkt op elk adres, ook `http://<server>:9888` in je eigen netwerk; passkeys vragen om een https-adres met een domeinnaam.
 - **NAS Storage Analyzer**: lees de setup-token in de log (zoek `setup_token`), open `http://<server>:6480`, maak de beheerder met een
   wachtwoord en een authenticator-app, en voeg je shares toe met hun pad, bijvoorbeeld `/mnt/user/media`.
+- **Spoolman**: open `http://<server>:7912` en voeg je filamenten en spoelen toe. Hij heeft geen eigen inlog, dus houd poort 7912 binnen je
+  thuisnetwerk.
+- **HaspelSync**: open `http://<server>:4000`; stel onder **Settings** meteen een wachtwoord in en het Spoolman-adres (`http://<server>:7912` voor
+  de Spoolman-app), en voeg daarna je printers toe met serienummer, IP-adres en toegangscode.
 
 ## Configuratie
 
@@ -129,11 +142,13 @@ Alles stel je in het formulier van de template in, waar elk veld zichzelf uitleg
 
 | App | Verplicht | Goed om te weten |
 |---|---|---|
-| DiscVault | De mappen (de standaardwaarden zijn prima) en **Timezone** (`TZ`) | Voor passkeys: **Passkey domain** (`RP_ID`) en **Passkey addresses** (`RP_ORIGINS`); leeg betekent localhost, en dat werkt alleen op de server zelf. **Password sign-in** (`LEGACY_AUTH_ENABLED`) zet je zelf aan. Blijven ze leeg, dan maakt de launcher het PostgreSQL-wachtwoord en het JWT-geheim bij de eerste start, in `/config/stack.env`. De launcher geeft de `DISCVAULT_OIDC_*`-variabelen nog niet door, dus de template biedt OpenID Connect niet aan. |
+| DiscVault | De mappen (de standaardwaarden zijn prima) en **Timezone** (`TZ`) | Voor passkeys: **Passkey domain** (`RP_ID`) en **Passkey addresses** (`RP_ORIGINS`); leeg betekent localhost, en dat werkt alleen op de server zelf. **Password sign-in** (`LEGACY_AUTH_ENABLED`) zet je zelf aan. Blijven ze leeg, dan maakt de launcher het PostgreSQL-wachtwoord en het JWT-geheim bij de eerste start, in `/config/stack.env`. De launcher geeft de `DISCVAULT_OIDC_*`-variabelen nog niet door, dus de template biedt OpenID Connect niet aan. Ook `DISCVAULT_INSTALLATION_COUNT` (de anonieme dagelijkse melding dat de server draait) geeft hij niet door: de eigenaar zet die in de app uit, met **Deze server meetellen** onder *Voorkeuren > Verzamelaars > Anonieme installatietelling*. |
 | 3D Print Pricing | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)), **Setup code** (`SETUP_CODE`) en **Session secret** (`SESSION_SECRET`). Beide hebben geen standaardwaarde: maak ze met `openssl rand -hex 8` en `openssl rand -hex 32` | Voor passkeys: `RP_ID` en `RP_ORIGINS`. Pushmeldingen vragen om een VAPID-sleutelpaar; het veld legt uit hoe je dat maakt. |
-| MealieShopper | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)) | Elk ander veld is optioneel: bij de eerste start loopt de app je door de beveiliging en de koppeling met Mealie. Een koppeling met Mealie die je in de app maakt, gaat voor de velden. |
+| MealieShopper | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)) | Elk ander veld is optioneel: bij de eerste start loopt de app je door de beveiliging en de koppeling met Mealie. Een koppeling met Mealie die je in de app maakt, gaat voor de velden. Onder *Show more settings*: de AH-prijsindex, productfoto's alvast ophalen, recepten uit de aanbiedingen, hoe lang je ingelogd blijft, het auditlogboek, SQLite (WAL en mmap) en telemetrie, elk op de standaardwaarde van de app. |
 | NAS Storage Analyzer | **App data** op een lokale schijf en **Encryption key** (`NASSA_ENCRYPTION_KEY`, maak hem met `openssl rand -base64 32` en bewaar een kopie: hij versleutelt de opgeslagen SMB-wachtwoorden) | De shares onder `/mnt/user` worden alleen-lezen op hetzelfde pad doorgegeven; **Shares group** (`NASSA_SHARES_GID`, 100) laat de app shares van `nobody:users` lezen. De container draait PostgreSQL, de webinterface en de scan-worker samen (het all-in-one image van de app) en krijgt `--shm-size=256m`. Passkeys vragen om **Passkey domain**, **Passkey addresses** en https. |
 | Doorbell Map | **Setup code** (`SETUP_TOKEN`, minstens 16 tekens, bijvoorbeeld `openssl rand -hex 12`) en **Session secret** (`SESSION_SECRET`, bijvoorbeeld `openssl rand -hex 32`) | **Origin** (`ORIGIN`) is optioneel sinds versie 1.0.35: leeg volgt de kaart het adres waarop hij wordt geopend; vul hem in (precies zoals in de adresbalk) als hij alleen op dat adres hoort te werken. Ook **Passkey domain** (`RP_ID`) is optioneel: leeg betekent de hostnaam van Origin of van het adres in de browser, en dat klopt bijna altijd. |
+| Spoolman | **App data** op een lokale schijf (zie [Data en back-ups](#data-en-back-ups)) | **Nightly backup** (`SPOOLMAN_AUTOMATIC_BACKUP`, aan), **Log level** en **Update check**. **PUID**/**PGID** (99/100) laten hem schrijven als `nobody:users`; achter een reverse proxy **Base path**, **Allowed origins (CORS)** en **Allowed host names**. |
+| HaspelSync | Niets: het Spoolman-adres, de printers en het wachtwoord stel je in de webinterface in | Hij draait als `nobody:users` (`--user 99:100`), dus zijn appdata-mappen moeten schrijfbaar zijn voor 99:100, zoals Unraid ze maakt. Unraid moet de printers bereiken op poort 8883 en 990. Een andere hostnaam dan het IP-adres of een `.local`-naam voeg je eerst toe onder **Settings**, *Allowed host names*. |
 
 Houd een session secret vast als hij eenmaal is ingesteld: een nieuwe waarde logt iedereen uit.
 
@@ -146,11 +161,11 @@ Houd een session secret vast als hij eenmaal is ingesteld: een nieuwe waarde log
 | Terug naar de vorige versie | Bewerk de container en zet bij **Repository** een versietag in plaats van `latest`; de tags staan op de pakketpagina van de app (de *Registry*-link van de template). DiscVault: zet **Release channel** op `manual` en de tag (bijvoorbeeld `v26.10.17`) bij **DiscVault image** |
 | Logboek | Tabblad **Docker**: het icoon van de app, dan *Logs* |
 
-- **Health check:** DiscVault antwoordt op `/api/next/health`, 3D Print Pricing en MealieShopper op `/healthz`, Doorbell Map op `/api/auth/status`, NAS Storage Analyzer op `/readyz`.
+- **Health check:** DiscVault antwoordt op `/api/next/health`, 3D Print Pricing en MealieShopper op `/healthz`, Doorbell Map op `/api/auth/status`, NAS Storage Analyzer op `/readyz`, Spoolman op `/api/v1/health` en HaspelSync op `/api/auth/state`.
 - **Grootste upload:** 3D Print Pricing accepteert STL- en 3MF-bestanden tot 50 MB (**Largest upload (MB)**, `MAX_UPLOAD_MB`). Wat voor een
   app staat (een reverse proxy, een CDN) moet minstens zoveel toelaten. De andere apps noemen hun grens in hun eigen README.
-- **Updatecheck:** 3D Print Pricing en MealieShopper melden de eigenaar dat er een nieuwere release is; ze werken zichzelf nooit bij en
-  sturen niets over je installatie mee. Bij beide zet je hem in de template uit.
+- **Updatecheck:** 3D Print Pricing, MealieShopper en Spoolman melden de eigenaar dat er een nieuwere release is; ze werken zichzelf nooit bij en
+  sturen niets over je installatie mee. Bij alle drie zet je hem in de template uit.
 
 Een release die de database heeft gewijzigd, draait misschien niet op een oudere versie: ga dan terug door de back-up van voor de update
 terug te zetten.
@@ -166,8 +181,10 @@ Elke app bewaart alles in zijn eigen data-map (zie [De apps](#de-apps)); een bet
 | MealieShopper | De database en `secret.key` |
 | Doorbell Map | De huizen, de gebruikers met hun wachtwoorden en passkeys, instellingen en de automatische back-ups van de app |
 | NAS Storage Analyzer | `postgres/`: de PostgreSQL-database. De encryptiesleutel staat er niet in: bewaar hem bij je template-instellingen |
+| Spoolman | De database `spoolman.db`, de nachtelijke kopieën in `backups/` en de logboeken |
+| HaspelSync | `printers` (de printers, instellingen, vak-koppelingen en API-sleutels, als JSON-bestanden) en `logs` |
 
-De mappen van 3D Print Pricing, MealieShopper en NAS Storage Analyzer moeten op een **lokale schijf staan, niet op `/mnt/user`**: een database hoort
+De mappen van 3D Print Pricing, MealieShopper, NAS Storage Analyzer en Spoolman moeten op een **lokale schijf staan, niet op `/mnt/user`**: een database hoort
 niet op die FUSE-share (SQLite kan er gegevens verliezen, PostgreSQL wordt er traag). Daarom staan deze templates standaard op de cachepool
 (`/mnt/cache/appdata/<app>`; zonder cachepool `/mnt/diskN/appdata/...`). De container van 3D Print Pricing waarschuwt bij het starten als de map
 op zo'n bestandssysteem staat.
@@ -222,7 +239,7 @@ flowchart LR
 | | Stabiel | Beta |
 |---|---|---|
 | Template | `templates/<app>.xml` | `templates/<app>-beta.xml`, gegenereerd |
-| Image-tag | `latest` | `beta` |
+| Image-tag | `latest` | `beta` (Spoolman: `edge`, HaspelSync: `dev`) |
 | In de store | *DiscVault* | *DiscVault (beta)*, gemarkeerd als beta |
 | Poort | de poort van de app | één hoger |
 | Data-map | `.../appdata/<app>` | `.../appdata/<app>-beta` |
@@ -230,6 +247,8 @@ flowchart LR
 Een beta kan de database aanpassen op een manier die de stabiele versie niet kan lezen: zet een beta nooit op de data-map van de stabiele
 app. De beta van DiscVault heeft ook een eigen Compose-projectnaam en netwerk, zodat beide stacks naast elkaar draaien. De templates gebruiken
 de meebewegende tags, dus een nieuwe release van een app vraagt hier niets: de repository van de app bepaalt wat `latest` en `beta` zijn.
+Spoolman en HaspelSync hebben geen tag `beta`: hun beta's volgen `edge` (gebouwd vanaf de `master`-branch van Spoolman) en `dev` (de `main`-branch
+van HaspelSync), vastgelegd als `beta_tag` en `beta_branch` in `sources.json`.
 
 ## Meewerken
 
@@ -283,6 +302,8 @@ cataloguscompilatie. Opnieuw indienen:
 - Elk geheim is gemaskeerd in het formulier; `scripts/check_templates.py` keurt een template met een ongemaskeerd geheim veld af.
 - De DiscVault-launcher krijgt de Docker-socket, en daarmee controle over Docker op je server.
 - NAS Storage Analyzer krijgt `/mnt/user` alleen-lezen: hij leest mappen en de grootte en datums van bestanden, en kan niets op je shares veranderen.
+- Spoolman heeft geen eigen inlog en HaspelSync vraagt pas om een wachtwoord als je er een instelt: houd beide binnen je thuisnetwerk en stel
+  het wachtwoord van HaspelSync meteen na de eerste start in.
 - Zet voor toegang van buitenaf een reverse proxy met https voor een app; passkeys vragen sowieso om een https-adres met een domeinnaam.
 - Meld een kwetsbaarheid vertrouwelijk via een [security advisory](https://github.com/helmerzNL/unraid-community-apps/security/advisories/new),
   nooit in een openbaar issue.

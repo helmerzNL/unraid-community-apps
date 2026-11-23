@@ -2,7 +2,7 @@
 """Check that every template of this repository is complete and consistent with what the Community Applications store expects.
 
 Run `python scripts/check_templates.py`; exit code 1 and one line per problem when something is wrong. Add `--registry` to also ask ghcr.io
-whether the `latest` and `beta` tags of every image exist (needs the network). The store's own Validate and Scan, at
+whether the `latest` tag and the beta tag (`beta_tag` in `sources.json`, normally `beta`) of every image exist (needs the network). The store's own Validate and Scan, at
 https://ca.unraid.net/submit, remains the authoritative check.
 """
 from __future__ import annotations
@@ -46,7 +46,7 @@ def check_template(path: Path, root_dir: Path, sources: dict) -> list[str]:
         problems.append(f"{name}: not listed in sources.json")
         return problems
     repository = text(root, "Repository")
-    wanted = f"{sources[key]['image']}:{'beta' if beta else 'latest'}"
+    wanted = f"{sources[key]['image']}:{sources[key].get('beta_tag', 'beta') if beta else 'latest'}"
     if repository != wanted:
         problems.append(f"{name}: Repository is {repository!r}, expected {wanted!r} (lowercase, with its tag)")
     if (text(root, "Beta") == "true") != beta:
@@ -97,7 +97,8 @@ def check_template(path: Path, root_dir: Path, sources: dict) -> list[str]:
                 and not APPDATA.match(config.get("Default", "")):
             # A folder the app writes to belongs in appdata; a folder it only reads (the shares a scanner looks at) may be elsewhere.
             problems.append(f"{name}: Config {config.get('Name')!r}: a writable Path default belongs under /mnt/user, /mnt/cache or /mnt/diskN /appdata/")
-        if config.get("Target") == "/data" and sources[key].get("local_disk_data") and not LOCAL_DISK.match(config.get("Default", "")):
+        data_target = sources[key].get("data_target", "/data")       # Spoolman keeps its database in /home/app/.local/share/spoolman
+        if config.get("Target") == data_target and sources[key].get("local_disk_data") and not LOCAL_DISK.match(config.get("Default", "")):
             problems.append(f"{name}: the database is SQLite and must not be on /mnt/user (a FUSE share): use /mnt/cache/appdata/... or /mnt/diskN/appdata/...")
     webui = text(root, "WebUI")
     ports = [c.get("Target") for c in root.findall("Config") if c.get("Type") == "Port"]
@@ -158,7 +159,7 @@ def check_repository(root_dir: Path = ROOT, registry: bool = False) -> list[str]
 
 
 def check_registry(sources: dict) -> list[str]:
-    """Whether the latest and beta tags exist on ghcr.io (anonymous, public images)."""
+    """Whether the latest tag and the beta tag of every image exist on ghcr.io (anonymous, public images)."""
     import urllib.error
     import urllib.parse
     import urllib.request
@@ -173,7 +174,7 @@ def check_registry(sources: dict) -> list[str]:
         try:
             with get(f"https://{host}/token?service={host}&scope={urllib.parse.quote(f'repository:{image}:pull')}") as response:
                 token = json.load(response)["token"]
-            for tag in ("latest", "beta"):
+            for tag in ("latest", source.get("beta_tag", "beta")):
                 try:
                     with get(f"https://{host}/v2/{image}/manifests/{tag}", {"Authorization": f"Bearer {token}", "Accept": accept}, "HEAD"):
                         pass
