@@ -74,13 +74,14 @@ class SyncTest(unittest.TestCase):
         self.record("doorbell-map-beta", sv.entry("1.0.34-beta.202611031626", "helmerzNL/Doorbell-Map", {}, {"created": "2026-11-03T16:26:00Z"}, "1.0.34"))
         self.tags = {"helmerzNL/DiscVault": ["v26.10.17"], "helmerzNL/Doorbell-Map": ["v1.0.34", "v1.0.35"],
                      "helmerzNL/MealieShopper": ["v2.94.1", "v2.98.0-beta"], "Flux76HQ/3dprint_pricing": ["v0.26.23"],
-                     "helmerzNL/NAS-Storage-Analyzer": ["v0.2.1"]}
+                     "helmerzNL/NAS-Storage-Analyzer": ["v0.2.1"], "Donkie/Spoolman": ["v0.27.1"], "Rdiger-36/HaspelSync": ["v1.3.7"]}
         self.published = {"ghcr.io/helmerznl/discvault:26.10.17", "ghcr.io/helmerznl/doorbell-map:v1.0.35", "ghcr.io/helmerznl/mealieshopper:2.94.1",
                           "ghcr.io/helmerznl/mealieshopper:2.98.0-beta", "ghcr.io/flux76hq/3dprint_pricing:0.26.23",
-                          "ghcr.io/helmerznl/nas-storage-analyzer-aio:0.2.1"}
+                          "ghcr.io/helmerznl/nas-storage-analyzer-aio:0.2.1", "ghcr.io/donkie/spoolman:0.27.1", "ghcr.io/rdiger-36/haspelsync:1.3.7"}
         self.builds = {"ghcr.io/helmerznl/discvault:beta": "2026-11-04T08:00:00Z", "ghcr.io/helmerznl/doorbell-map:beta": "2026-11-04T09:15:00Z",
                        "ghcr.io/flux76hq/3dprint_pricing:beta": "2026-11-04T10:30:00Z",
-                       "ghcr.io/helmerznl/nas-storage-analyzer-aio:beta": "2026-11-05T13:00:00Z"}
+                       "ghcr.io/helmerznl/nas-storage-analyzer-aio:beta": "2026-11-05T13:00:00Z",
+                       "ghcr.io/donkie/spoolman:edge": "2026-11-05T14:00:00Z", "ghcr.io/rdiger-36/haspelsync:dev": "2026-11-05T15:00:00Z"}
 
     def record(self, name, text):
         path = self.tmp / "templates" / f"{name}.xml"
@@ -130,6 +131,48 @@ class SyncTest(unittest.TestCase):
         self.assertEqual(self.run_sync(), [])
         self.builds["ghcr.io/helmerznl/doorbell-map:beta"] = "2026-11-01T00:00:00Z"        # an older build than the recorded one
         self.assertEqual(self.run_sync(), [])
+
+    def test_a_beta_on_its_own_tag_is_recorded(self):
+        # Spoolman and HaspelSync have no `beta` tag: their betas follow `edge` and `dev`, and their version is named after those builds.
+        self.run_sync()
+        self.assertEqual(sv.recorded(self.template("spoolman")), "0.27.1")
+        self.assertEqual(sv.recorded(self.template("spoolman-beta")), "0.27.1-beta.202611051400")
+        self.assertEqual(sv.recorded(self.template("haspelsync-beta")), "1.3.7-beta.202611051500")
+        self.assertIn("https://github.com/Donkie/Spoolman/", self.template("spoolman-beta"))
+
+
+class TagsFallBackToGitTest(unittest.TestCase):
+    """The GitHub API refuses the tags of some repositories of other owners from behind a proxy or without a token; git ls-remote still reads them."""
+
+    def setUp(self):
+        import urllib.error
+        self.error = lambda code: urllib.error.HTTPError("https://api.github.com/", code, "refused", {}, None)
+        api, self.git_tags = sv.api_tags, sv.git_tags
+        self.addCleanup(setattr, sv, "api_tags", api)
+        self.addCleanup(setattr, sv, "git_tags", self.git_tags)
+        sv.git_tags = lambda repo: ["v0.27.1"]
+
+    def test_a_refused_api_falls_back_to_git(self):
+        for code in (403, 404, 429):
+            def refused(repo, code=code):
+                raise self.error(code)
+            sv.api_tags = refused
+            self.assertEqual(sv.repo_tags("Donkie/Spoolman"), ["v0.27.1"], code)
+
+    def test_another_error_is_not_hidden(self):
+        def broken(repo):
+            raise self.error(500)
+        sv.api_tags = broken
+        import urllib.error
+        with self.assertRaises(urllib.error.HTTPError):
+            sv.repo_tags("Donkie/Spoolman")
+
+    def test_git_reads_the_tag_names(self):
+        import subprocess
+        from unittest import mock
+        out = "abc\trefs/tags/v0.27.0\ndef\trefs/tags/v0.27.1\n"
+        with mock.patch.object(subprocess, "run", return_value=subprocess.CompletedProcess([], 0, out, "")):
+            self.assertEqual(self.git_tags("Donkie/Spoolman"), ["v0.27.0", "v0.27.1"])
 
 
 class DeriveKeepsTheBetaChangesTest(unittest.TestCase):

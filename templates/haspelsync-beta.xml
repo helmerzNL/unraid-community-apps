@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>HaspelSync (beta)</Name>
+  <Repository>ghcr.io/rdiger-36/haspelsync:dev</Repository>
+  <Registry>https://github.com/Rdiger-36/HaspelSync/pkgs/container/haspelsync</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Beta>true</Beta>
+  <Support>https://github.com/Rdiger-36/HaspelSync/issues</Support>
+  <Project>https://github.com/Rdiger-36/HaspelSync</Project>
+  <Overview>Beta (English): the development version of the app, built from its main branch. It can be unstable and can change the database in ways the stable version cannot read. It has its own app data folder and port, so it runs next to the stable app. Do not point it at the data of the stable app.[br][br]Bèta (Nederlands): de ontwikkelversie van de app, gebouwd vanaf de main-branch. Hij kan onstabiel zijn en de database aanpassen op een manier die de stabiele versie niet kan lezen. Hij heeft een eigen data-map en poort, dus hij draait naast de stabiele app. Gebruik de data van de stabiele app niet voor de beta.[br][br]English: HaspelSync listens to your Bambu Lab printers and keeps Spoolman (also in this repository) in step with them: which spool sits in which AMS slot, and what every print actually used, taken from the sliced file. For every printer you need its serial number, IP address and access code, and Unraid has to reach the printer on port 8883 (MQTT) and 990 (FTPS); nothing goes through the Bambu cloud. HaspelSync is made by Rdiger-36; this template only runs the published image, so a problem in HaspelSync itself belongs in its own repository. The web interface has no password until you set one under Settings: set one right after the first start and do not forward the port on your router. HaspelSync answers on the IP address of your server and on names ending in .local; add any other name (behind a reverse proxy) under Settings, Allowed host names, first. The container runs as nobody:users (99:100), so it writes to the appdata folders Unraid makes for it.[br][br]Nederlands: HaspelSync luistert naar je Bambu Lab-printers en houdt Spoolman (ook in deze repository) daarmee gelijk: welke spoel in welk AMS-vak zit, en wat elke print echt verbruikte, gelezen uit het geslicede bestand. Per printer heb je het serienummer, het IP-adres en de toegangscode nodig, en Unraid moet de printer bereiken op poort 8883 (MQTT) en 990 (FTPS); er gaat niets via de Bambu-cloud. HaspelSync is gemaakt door Rdiger-36; deze template draait alleen het gepubliceerde image, dus een probleem in HaspelSync zelf hoort in de eigen repository. De webinterface heeft geen wachtwoord totdat je er een instelt onder Settings: doe dat meteen na de eerste start en zet de poort niet open in je router. HaspelSync antwoordt op het IP-adres van je server en op namen die op .local eindigen; voeg een andere naam (achter een reverse proxy) eerst toe onder Settings, Allowed host names. De container draait als nobody:users (99:100), zodat hij in de appdata-mappen schrijft die Unraid voor hem maakt.</Overview>
+  <Category>Tools:</Category>
+  <WebUI>http://[IP]:[PORT:4000]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/templates/haspelsync-beta.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/helmerzNL/unraid-community-apps/main/icons/haspelsync.png</Icon>
+  <ExtraParams>--user 99:100</ExtraParams>
+  <PostArgs/>
+  <Date>2026-11-23</Date>
+  <Changes>### 1.3.7-beta.202611221751
+- Beta build of 2026-11-22 17:51 UTC, after release 1.3.7. / Beta-build van 2026-11-22 17:51 UTC, na release 1.3.7.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/Rdiger-36/HaspelSync/compare/v1.3.7...ce3883b554e10b025be5a04a1a31397cd9a4f217</Changes>
+  <MinVer>6.12.0</MinVer>
+  <Config Name="Web UI port" Target="4000" Default="4001" Mode="tcp" Description="Port of the web interface and the API (container port 4000). / Poort van de webinterface en de API (containerpoort 4000)." Type="Port" Display="always" Required="true" Mask="false">4001</Config>
+  <Config Name="Printers and settings" Target="/app/printers" Default="/mnt/user/appdata/haspelsync-beta/printers" Mode="rw" Description="The printers, settings, slot mappings, API keys and the state of a running print, as JSON files. Must be writable for 99:100 (nobody:users), as Unraid makes appdata folders. / De printers, instellingen, vak-koppelingen en API-sleutels, als JSON-bestanden; moet schrijfbaar zijn voor 99:100." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/haspelsync-beta/printers</Config>
+  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/haspelsync-beta/logs" Mode="rw" Description="The log files of HaspelSync. Must be writable for 99:100 (nobody:users). / De logbestanden van HaspelSync; moet schrijfbaar zijn voor 99:100." Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/haspelsync-beta/logs</Config>
+</Container>

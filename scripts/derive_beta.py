@@ -2,7 +2,7 @@
 """Make the beta templates from the stable templates, so the two cannot drift apart.
 
 Every key of `sources.json` has a stable template `templates/<key>.xml` and a generated `templates/<key>-beta.xml`. The beta template is the
-stable one with: the name "<name> (beta)", the `beta` tag of the image, `<Beta>true</Beta>` (so the store labels it), its own TemplateURL, its
+stable one with: the name "<name> (beta)", the beta tag of the image (`beta_tag` in `sources.json`, normally `beta`; Spoolman's is `edge`, HaspelSync's `dev`), `<Beta>true</Beta>` (so the store labels it), its own TemplateURL, its
 own app data folders (every `/mnt/<user|cache|diskN>/appdata/<key>...` folder gets `-beta` after the key), the host port plus one, a notice in the Overview and,
 per `sources.json`: a hidden variable that makes the app show a BETA label (`beta_env`) and values that must differ for a parallel install
 (`beta_overrides`, for example the Compose project name of a stack; a dropdown then starts on the new value). Edit the stable template, then run this script.
@@ -23,10 +23,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 NOTICE = (
-    "Beta (English): the development version of the app, built from its beta branch. It can be unstable and can change the database in ways "
+    "Beta (English): the development version of the app, built from its {branch} branch. It can be unstable and can change the database in ways "
     "the stable version cannot read. It has its own app data folder and port, so it runs next to the stable app. Do not point it at the data "
     "of the stable app.[br][br]"
-    "Bèta (Nederlands): de ontwikkelversie van de app, gebouwd vanaf de beta-branch. Hij kan onstabiel zijn en de database aanpassen op een "
+    "Bèta (Nederlands): de ontwikkelversie van de app, gebouwd vanaf de {branch}-branch. Hij kan onstabiel zijn en de database aanpassen op een "
     "manier die de stabiele versie niet kan lezen. Hij heeft een eigen data-map en poort, dus hij draait naast de stabiele app. Gebruik de "
     "data van de stabiele app niet voor de beta.[br][br]"
 )
@@ -59,10 +59,12 @@ def _once(pattern: str, replacement: str, text: str) -> str:
 def beta_template(stable: str, key: str, source: dict, current: str | None = None) -> str:
     """The beta template made from the stable one; `current` is the beta template as it is now, whose <Changes> it keeps."""
     text = _once(r"<Name>(.*?)</Name>", r"<Name>\1 (beta)</Name>", CHANGES.sub("", stable))
-    text = _once(r"(<Repository>[^<]*):latest</Repository>", r"\1:beta</Repository>", text)
+    tag = source.get("beta_tag", "beta")
+    branch = source.get("beta_branch", "beta")      # the branch the notice names; the commit links of sync_versions.py use versions.beta.branch
+    text = _once(r"(<Repository>[^<]*):latest</Repository>", rf"\1:{tag}</Repository>", text)
     text = _once(r"(  <Privileged>[^<]*</Privileged>\n)", r"\1  <Beta>true</Beta>\n", text)
     text = _once(rf"/templates/{re.escape(key)}\.xml</TemplateURL>", f"/templates/{key}-beta.xml</TemplateURL>", text)
-    text = _once(r"<Overview>", "<Overview>" + NOTICE.replace("\\", "\\\\"), text)
+    text = _once(r"<Overview>", "<Overview>" + NOTICE.format(branch=branch).replace("\\", "\\\\"), text)
     text = re.sub(rf"(/mnt/[A-Za-z0-9]+/appdata/{re.escape(key)})", r"\1-beta", text)       # /mnt/user, /mnt/cache or /mnt/diskN
 
     def next_port(match: re.Match) -> str:

@@ -30,6 +30,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -69,6 +70,23 @@ def _get(url: str, headers: dict | None = None, method: str = "GET"):
 
 
 def repo_tags(repo: str) -> list[str]:
+    """The tags of a GitHub repository: the API first; git when the API refuses (403/404/429), as it does for some repositories of other
+    owners (Spoolman, HaspelSync) from behind a proxy or without a token."""
+    try:
+        return api_tags(repo)
+    except urllib.error.HTTPError as error:
+        if error.code not in (403, 404, 429):
+            raise
+        return git_tags(repo)
+
+
+def git_tags(repo: str) -> list[str]:
+    done = subprocess.run(["git", "ls-remote", "--tags", "--refs", f"https://github.com/{repo}.git"],
+                          capture_output=True, text=True, timeout=60, check=True)
+    return [line.split("refs/tags/", 1)[1] for line in done.stdout.splitlines() if "\trefs/tags/" in line]
+
+
+def api_tags(repo: str) -> list[str]:
     headers = {"Accept": "application/vnd.github+json"}
     if os.environ.get("GITHUB_TOKEN"):
         headers["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"

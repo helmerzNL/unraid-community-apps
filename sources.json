@@ -49,5 +49,27 @@
       "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/nas-storage-analyzer-aio:{version}"},
       "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/helmerznl/nas-storage-analyzer-aio:beta", "branch": "beta"}
     }
+  },
+  "spoolman": {
+    "app_repo": "Donkie/Spoolman",
+    "image": "ghcr.io/donkie/spoolman",
+    "beta_tag": "edge",
+    "beta_branch": "master",
+    "local_disk_data": true,
+    "data_target": "/home/app/.local/share/spoolman",
+    "versions": {
+      "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/donkie/spoolman:{version}"},
+      "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/donkie/spoolman:edge", "branch": "master"}
+    }
+  },
+  "haspelsync": {
+    "app_repo": "Rdiger-36/HaspelSync",
+    "image": "ghcr.io/rdiger-36/haspelsync",
+    "beta_tag": "dev",
+    "beta_branch": "main",
+    "versions": {
+      "stable": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/rdiger-36/haspelsync:{version}"},
+      "beta": {"tag": "^v(\\d+\\.\\d+\\.\\d+)$", "image": "ghcr.io/rdiger-36/haspelsync:dev", "branch": "main"}
+    }
   }
 }
