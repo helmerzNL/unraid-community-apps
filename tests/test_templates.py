@@ -186,7 +186,8 @@ class MealieShopperSettingsTest(unittest.TestCase):
 
     DEFAULTS = {"MEALIESHOPPER_PRICE_INDEX": "true", "MEALIESHOPPER_IMAGE_PREFETCH": "true", "MEALIESHOPPER_OFFERS_RECIPES": "false",
                 "MEALIESHOPPER_SQLITE_MMAP_MB": "1024", "MEALIESHOPPER_AUDIT_BODIES": "true", "MEALIESHOPPER_AUDIT_BODY_CHARS": "4000",
-                "MEALIESHOPPER_SESSION_DAYS": "90", "MEALIESHOPPER_TELEMETRY": "false", "MEALIESHOPPER_TELEMETRY_SLOW_MS": "500"}
+                "MEALIESHOPPER_SESSION_DAYS": "90", "MEALIESHOPPER_TELEMETRY": "false", "MEALIESHOPPER_TELEMETRY_SLOW_MS": "500",
+                "MEALIESHOPPER_OFFERS_SYNC_SPREAD": "90"}
 
     def test_optional_advanced_and_on_the_default_of_the_app(self):
         for name in ("mealieshopper.xml", "mealieshopper-beta.xml"):
@@ -195,6 +196,24 @@ class MealieShopperSettingsTest(unittest.TestCase):
                 entry = by_target[target]
                 self.assertEqual((entry.get("Display"), entry.get("Required"), entry.text), ("advanced", "false", value), (name, target))
                 self.assertEqual(entry.get("Default").split("|")[0], value, (name, target))
+
+
+    def test_the_offers_run_is_left_to_the_app(self):
+        """Since 4.33.0 MEALIESHOPPER_OFFERS_SYNC_HOUR is the hour a window starts on, and empty is a different time every day between 07:30 and
+        09:00 (mealieshopper/offers_schedule.py). A fixed 5 kept the run at 05:00, when the AH bonus was not complete yet: the field is empty."""
+        for name in ("mealieshopper.xml", "mealieshopper-beta.xml"):
+            entry = {c.get("Target"): c for c in ET.parse(ROOT / "templates" / name).getroot().findall("Config")}["MEALIESHOPPER_OFFERS_SYNC_HOUR"]
+            self.assertEqual((entry.get("Default"), entry.text), ("", None), name)
+
+
+class HaspelSyncCloudTest(unittest.TestCase):
+    def test_the_overview_says_what_is_read_from_the_bambu_cloud(self):
+        # Since 1.4.1 HaspelSync downloads the sliced file of a cloud print from the job's cloud link (Rdiger-36/HaspelSync issue #281).
+        for name in ("haspelsync.xml", "haspelsync-beta.xml"):
+            overview = ET.parse(ROOT / "templates" / name).getroot().find("Overview").text
+            self.assertNotIn("nothing goes through the Bambu cloud", overview, name)
+            self.assertIn("Nothing is sent to the Bambu cloud", overview, name)
+            self.assertIn("Er gaat niets naar de Bambu-cloud", overview, name)
 
 
 class NasStorageAnalyzerTest(unittest.TestCase):
