@@ -17,7 +17,11 @@
   <ExtraParams>--user 99:100</ExtraParams>
   <PostArgs/>
   <Date>2026-11-23</Date>
-  <Changes>### 1.4.0
+  <Changes>### 1.4.2
+- Version 1.4.2 of the app. / Versie 1.4.2 van de app.
+- Release notes / release-teksten: https://github.com/Rdiger-36/HaspelSync/releases/tag/v1.4.2
+
+### 1.4.0
 - Version 1.4.0 of the app. / Versie 1.4.0 van de app.
 - Release notes / release-teksten: https://github.com/Rdiger-36/HaspelSync/releases/tag/v1.4.0
 

@@ -18,7 +18,11 @@
   <ExtraParams>--user 99:100</ExtraParams>
   <PostArgs/>
   <Date>2026-11-23</Date>
-  <Changes>### 1.4.0-beta.202611252102
+  <Changes>### 1.4.2-beta.202611252102
+- Beta build of 2026-11-25 21:02 UTC, after release 1.4.2. / Beta-build van 2026-11-25 21:02 UTC, na release 1.4.2.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/Rdiger-36/HaspelSync/compare/v1.4.2...b75524dbd5204a8ddfd04649773774acc77bf22f
+
+### 1.4.0-beta.202611252102
 - Beta build of 2026-11-25 21:02 UTC, after release 1.4.0. / Beta-build van 2026-11-25 21:02 UTC, na release 1.4.0.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/Rdiger-36/HaspelSync/compare/v1.4.0...b75524dbd5204a8ddfd04649773774acc77bf22f
 
