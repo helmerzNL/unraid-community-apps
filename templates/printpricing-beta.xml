@@ -18,7 +18,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-29</Date>
-  <Changes>### 2.9.0-beta.202611270003
+  <Changes>### 2.9.0-beta.202611271814
+- Beta build of 2026-11-27 18:14 UTC, after release 2.9.0. / Beta-build van 2026-11-27 18:14 UTC, na release 2.9.0.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/Flux76HQ/3dprint_pricing/commits/beta
+
+### 2.9.0-beta.202611270003
 - Beta build of 2026-11-27 00:03 UTC, after release 2.9.0. / Beta-build van 2026-11-27 00:03 UTC, na release 2.9.0.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/Flux76HQ/3dprint_pricing/commits/beta
 
@@ -52,10 +56,6 @@
 
 ### 0.27.1-beta.202611121626
 - Beta build of 2026-11-12 16:26 UTC, after release 0.27.1. / Beta-build van 2026-11-12 16:26 UTC, na release 0.27.1.
-- What changed since that release / wat er sinds die release veranderde: https://github.com/Flux76HQ/3dprint_pricing/commits/beta
-
-### 0.27.1-beta.202611120142
-- Beta build of 2026-11-12 01:42 UTC, after release 0.27.1. / Beta-build van 2026-11-12 01:42 UTC, na release 0.27.1.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/Flux76HQ/3dprint_pricing/commits/beta</Changes>
   <MinVer>6.12.0</MinVer>
   <Config Name="Web UI port" Target="6080" Default="6281" Mode="tcp" Description="Host port of the web interface (the container listens on 6080). 6280 because DiscVault uses 6080. / Hostpoort van de webinterface (de container luistert op 6080)." Type="Port" Display="always" Required="true" Mask="false">6281</Config>

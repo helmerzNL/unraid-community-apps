@@ -18,7 +18,11 @@
   <ExtraParams/>
   <PostArgs/>
   <Date>2026-10-28</Date>
-  <Changes>### 26.11.9-beta.202611261800
+  <Changes>### 26.11.9-beta.202611280101
+- Beta build of 2026-11-28 01:01 UTC, after release 26.11.9. / Beta-build van 2026-11-28 01:01 UTC, na release 26.11.9.
+- What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/DiscVault/compare/v26.11.9...f13032eab1f19aa384af4c683042cf2103825748
+
+### 26.11.9-beta.202611261800
 - Beta build of 2026-11-26 18:00 UTC, after release 26.11.9. / Beta-build van 2026-11-26 18:00 UTC, na release 26.11.9.
 - What changed since that release / wat er sinds die release veranderde: https://github.com/helmerzNL/DiscVault/compare/v26.11.9...07f0d55b755958dd7e16a8ef548a26e66af02e85
 
